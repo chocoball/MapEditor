@@ -4,15 +4,17 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT			+=	core gui
 
-TARGET = MapEditor
-TEMPLATE = app
+TARGET		=	MapEditor
+TEMPLATE	=	app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp
+SOURCES		+=	main.cpp		\
+				mainwindow.cpp	\
+				csetting.cpp
 
-HEADERS  += mainwindow.h
+HEADERS		+=	mainwindow.h	\
+				csetting.h
 
-FORMS    += mainwindow.ui
+FORMS		+=	mainwindow.ui
