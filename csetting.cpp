@@ -2,6 +2,7 @@
 
 #define kKeyFileOpen	"fileOpenDir"
 
+
 CSetting::CSetting()
 {
 	QSettings settings(qApp->applicationDirPath() + "/settnig.ini", QSettings::IniFormat) ;
