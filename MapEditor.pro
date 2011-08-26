@@ -12,9 +12,12 @@ TEMPLATE	=	app
 
 SOURCES		+=	main.cpp		\
 				mainwindow.cpp	\
-				csetting.cpp
+				csetting.cpp	\
+				ceditdata.cpp
 
 HEADERS		+=	mainwindow.h	\
-				csetting.h
+				csetting.h		\
+				ceditdata.h		\
+				include.h
 
 FORMS		+=	mainwindow.ui
