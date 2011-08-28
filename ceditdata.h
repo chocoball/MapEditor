@@ -26,6 +26,7 @@ public:
 private:
 	QImage		m_Image ;
 	QLabel		*m_pImageLabel ;
+	QList<int>	m_selectGridIndeces ;
 };
 
 #define g_EditData CEditData::getInstance()
