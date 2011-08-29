@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "include.h"
+#include "cimagelabel.h"
 
 #define kExecName		"MapEditor"
 #define kVersion		0x00000000
@@ -14,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	setWindowTitle(kExecName);
 
-	QLabel *pLabelImage = new QLabel(this) ;
+	QLabel *pLabelImage = new CImageLabel(this) ;
 	ui->scrollArea_Image->setWidget(pLabelImage);
 	g_EditData->setImageLabel(pLabelImage) ;
 
@@ -114,6 +115,7 @@ void MainWindow::fileOpen(QString &fileName)
 			QMessageBox::warning(this, trUtf8("エラー"), trUtf8("読み込みに失敗しました:%1").arg(fileName)) ;
 			return ;
 		}
+		qDebug() << "orig size:" << image.size() ;
 		g_EditData->setImage(image) ;
 		g_EditData->updateMap() ;
 		m_strSaveFileName = QString() ;

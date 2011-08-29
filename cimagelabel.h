@@ -18,6 +18,10 @@ protected:
 	void mousePressEvent(QMouseEvent *ev) ;
 	void mouseMoveEvent(QMouseEvent *ev) ;
 	void mouseReleaseEvent(QMouseEvent *ev) ;
+
+private:
+	QPoint		m_selStart, m_selEnd ;
+	QPoint		m_selGridSt, m_selGridEnd ;
 };
 
 #endif // CIMAGELABEL_H
