@@ -3,6 +3,7 @@
 CEditData::CEditData()
 {
 	m_pImageLabel = NULL ;
+	m_pMapLabel = NULL ;
 	m_selStartGrid.setX(-1) ;
 	m_selEndGrid.setX(-1) ;
 }

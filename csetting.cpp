@@ -23,6 +23,11 @@ CSetting::CSetting()
 	m_MainWindowGeometry	= settings.value(kKeyWindowGeometry).toByteArray() ;
 	m_MainWindowState		= settings.value(kKeyWindowState).toByteArray() ;
 	settings.endGroup();
+
+	settings.beginGroup("SplitterMap") ;
+	m_SplitterMapGeometry	= settings.value(kKeyWindowGeometry).toByteArray() ;
+	m_SplitterMapState		= settings.value(kKeyWindowState).toByteArray() ;
+	settings.endGroup();
 }
 
 CSetting::~CSetting()
@@ -45,5 +50,10 @@ void CSetting::writeSetting()
 	settings.beginGroup("MainWindow") ;
 	settings.setValue(kKeyWindowGeometry, m_MainWindowGeometry) ;
 	settings.setValue(kKeyWindowState, m_MainWindowState) ;
+	settings.endGroup();
+
+	settings.beginGroup("SplitterMap") ;
+	settings.setValue(kKeyWindowGeometry, m_SplitterMapGeometry) ;
+	settings.setValue(kKeyWindowState, m_SplitterMapState) ;
 	settings.endGroup();
 }

@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>742</width>
-    <height>483</height>
+    <width>700</width>
+    <height>473</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>700</width>
+    <height>473</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string/>
@@ -145,8 +151,8 @@
       <rect>
        <x>10</x>
        <y>50</y>
-       <width>261</width>
-       <height>251</height>
+       <width>271</width>
+       <height>261</height>
       </rect>
      </property>
      <property name="widgetResizable">
@@ -196,8 +202,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>379</width>
-        <height>419</height>
+        <width>377</width>
+        <height>417</height>
        </rect>
       </property>
      </widget>
@@ -222,8 +228,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>742</width>
-     <height>22</height>
+     <width>700</width>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

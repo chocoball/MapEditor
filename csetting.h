@@ -29,6 +29,11 @@ public:
 	QByteArray getMainWindowState()				{ return m_MainWindowState ; }
 	void setMainWindowState(QByteArray val)		{ m_MainWindowState = val ; }
 
+	QByteArray getSplitterMapGeometry()			{ return m_SplitterMapGeometry ; }
+	void setSplitterMapGeometry(QByteArray val)	{ m_SplitterMapGeometry = val ; }
+	QByteArray getSplitterMapState()			{ return m_SplitterMapState ; }
+	void setSplitterMapState(QByteArray val)	{ m_SplitterMapState = val ; }
+
 	int getGridW()								{ return m_gridW ; }
 	void setGridW(int w)						{ m_gridW = w ; }
 	int getGridH()								{ return m_gridH ; }
@@ -40,8 +45,9 @@ public:
 private:
 	QString		m_fileOpenDir ;
 	QString		m_fileSaveDir ;
-	QByteArray	m_MainWindowGeometry ;
-	QByteArray	m_MainWindowState ;
+	QByteArray	m_MainWindowGeometry, m_MainWindowState ;
+	QByteArray	m_SplitterMapGeometry, m_SplitterMapState ;
+
 	int			m_gridW, m_gridH ;
 };
 

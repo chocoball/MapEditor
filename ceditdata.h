@@ -25,6 +25,7 @@ public:
 	void setSelEndGrid(QPoint pos) { m_selEndGrid = pos ; }
 
 	void setImageLabel(QLabel *p) { m_pImageLabel = p ; }
+	void setMapLabel(QLabel *p) { m_pMapLabel = p ; }
 
 	void updateMap() ;
 	void updateImage() ;
@@ -37,6 +38,8 @@ public:
 private:
 	QImage		m_Image ;
 	QLabel		*m_pImageLabel ;
+	QLabel		*m_pMapLabel ;
+
 	QList<int>	m_gridData ;
 	QList<int>	m_selectGridIndeces ;
 	QPoint		m_selStartGrid, m_selEndGrid ;
