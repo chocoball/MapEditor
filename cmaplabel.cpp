@@ -9,6 +9,8 @@ CMapLabel::CMapLabel(QWidget *parent) :
 
 void CMapLabel::dropEvent(QDropEvent *event)
 {
+	qDebug() << event->mimeData()->formats() ;
+
 	if ( event->mimeData()->hasFormat("editor/selected-image") ) {
 		QPixmap pix ;
 		QRect rect ;

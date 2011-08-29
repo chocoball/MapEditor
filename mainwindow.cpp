@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QLabel *pLabelMap = new CMapLabel(this) ;
 	ui->scrollArea_Map->setWidget(pLabelMap) ;
 	g_EditData->setMapLabel(pLabelMap) ;
+	g_EditData->updateMap();
 
 	m_pSplitterImage = new QSplitter(ui->centralWidget) ;
 	m_pSplitterImage->addWidget(ui->frame_image) ;

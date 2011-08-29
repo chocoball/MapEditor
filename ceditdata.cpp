@@ -21,14 +21,15 @@ void CEditData::updateMap()
 	int gridW = g_Setting->getGridW() ;
 	int gridH = g_Setting->getGridH() ;
 	QImage img = QImage(gridW*100, gridH*100, QImage::Format_ARGB32) ;
+	QColor col(0, 0, 0) ;
 	for ( int y = 0 ; y < img.height() ; y += gridH ) {
 		for ( int x = 0 ; x < img.width() ; x ++ ) {
-			img.setPixel(x, y, 0) ;
+			img.setPixel(x, y, col.rgba()) ;
 		}
 	}
 	for ( int x = 0 ; x < img.width() ; x += gridW ) {
 		for ( int y = 0 ; y < img.height() ; y ++ ) {
-			img.setPixel(x, y, 0) ;
+			img.setPixel(x, y, col.rgba()) ;
 		}
 	}
 	QPixmap pix = QPixmap::fromImage(img) ;
