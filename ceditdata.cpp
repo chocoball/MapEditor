@@ -8,9 +8,32 @@ CEditData::CEditData()
 	m_selEndGrid.setX(-1) ;
 }
 
+void CEditData::update()
+{
+	updateMap() ;
+	updateImage() ;
+}
+
 void CEditData::updateMap()
 {
-	updateImage() ;
+	if ( !m_pMapLabel ) { return ; }
+
+	int gridW = g_Setting->getGridW() ;
+	int gridH = g_Setting->getGridH() ;
+	QImage img = QImage(gridW*100, gridH*100, QImage::Format_ARGB32) ;
+	for ( int y = 0 ; y < img.height() ; y += gridH ) {
+		for ( int x = 0 ; x < img.width() ; x ++ ) {
+			img.setPixel(x, y, 0) ;
+		}
+	}
+	for ( int x = 0 ; x < img.width() ; x += gridW ) {
+		for ( int y = 0 ; y < img.height() ; y ++ ) {
+			img.setPixel(x, y, 0) ;
+		}
+	}
+	QPixmap pix = QPixmap::fromImage(img) ;
+	m_pMapLabel->setPixmap(pix) ;
+	m_pMapLabel->resize(img.size());
 }
 
 void CEditData::updateImage()

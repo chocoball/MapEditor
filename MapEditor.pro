@@ -14,12 +14,14 @@ SOURCES		+=	main.cpp		\
 				mainwindow.cpp	\
 				csetting.cpp	\
 				ceditdata.cpp \
-    cimagelabel.cpp
+    cimagelabel.cpp \
+    cmaplabel.cpp
 
 HEADERS		+=	mainwindow.h	\
 				csetting.h		\
 				ceditdata.h		\
 				include.h \
-    cimagelabel.h
+    cimagelabel.h \
+    cmaplabel.h
 
 FORMS		+=	mainwindow.ui

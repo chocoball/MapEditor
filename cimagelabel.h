@@ -20,6 +20,9 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *ev) ;
 
 private:
+	void startDrag(QPoint pos) ;
+
+private:
 	QPoint		m_selStart, m_selEnd ;
 	QPoint		m_selGridSt, m_selGridEnd ;
 };

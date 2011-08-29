@@ -27,6 +27,7 @@ public:
 	void setImageLabel(QLabel *p) { m_pImageLabel = p ; }
 	void setMapLabel(QLabel *p) { m_pMapLabel = p ; }
 
+	void update() ;
 	void updateMap() ;
 	void updateImage() ;
 

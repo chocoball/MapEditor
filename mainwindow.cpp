@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "include.h"
 #include "cimagelabel.h"
+#include "cmaplabel.h"
 
 #define kExecName		"MapEditor"
 #define kVersion		0x00000000
@@ -19,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->scrollArea_Image->setWidget(pLabelImage);
 	g_EditData->setImageLabel(pLabelImage) ;
 
-	QLabel *pLabelMap = new QLabel(this) ;
+	QLabel *pLabelMap = new CMapLabel(this) ;
 	ui->scrollArea_Map->setWidget(pLabelMap) ;
 	g_EditData->setMapLabel(pLabelMap) ;
 
@@ -153,7 +154,7 @@ void MainWindow::fileOpen(QString &fileName)
 		}
 		qDebug() << "orig size:" << image.size() ;
 		g_EditData->setImage(image) ;
-		g_EditData->updateMap() ;
+		g_EditData->update() ;
 		m_strSaveFileName = QString() ;
 	}
 	else if ( fileName.toLower().indexOf(kFileExt_JSON) > 0 ) {	// JSONファイル
