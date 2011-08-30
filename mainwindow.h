@@ -24,6 +24,11 @@ public slots:
 	void slot_splitterMoveImage(int, int) ;
 	void slot_splitterMoveMap(int, int) ;
 
+	void slot_changeImageGridW(int val) ;
+	void slot_changeImageGridH(int val) ;
+	void slot_changeMapGridW(int val) ;
+	void slot_changeMapGridH(int val) ;
+
 protected:
 	void closeEvent(QCloseEvent *) ;
 	void resizeEvent(QResizeEvent *) ;

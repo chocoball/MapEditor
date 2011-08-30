@@ -4,8 +4,8 @@
 #define kKeyFileSaveDir		"fileSaveDir"
 #define kKeyWindowGeometry	"geometry"
 #define kKeyWindowState		"state"
-#define kKeyGridWidth		"grid_w"
-#define kKeyGridHeight		"grid_h"
+#define kKeyImageGridSize	"img_grid_size"
+#define kKeyMapGridSize		"map_grid_size"
 
 
 CSetting::CSetting()
@@ -15,8 +15,8 @@ CSetting::CSetting()
 	settings.beginGroup("Global");
 	m_fileOpenDir = settings.value(kKeyFileOpenDir, "./").toString() ;
 	m_fileSaveDir = settings.value(kKeyFileSaveDir, "./").toString() ;
-	m_gridW = settings.value(kKeyGridWidth, 16).toInt() ;
-	m_gridH = settings.value(kKeyGridHeight, 16).toInt() ;
+	m_imgGridSize = settings.value(kKeyImageGridSize, QSize(16, 16)).toSize() ;
+	m_mapGridSize = settings.value(kKeyMapGridSize, QSize(90, 90)).toSize() ;
 	settings.endGroup();
 
 	settings.beginGroup("MainWindow") ;
@@ -27,6 +27,15 @@ CSetting::CSetting()
 	settings.beginGroup("SplitterMap") ;
 	m_SplitterMapGeometry	= settings.value(kKeyWindowGeometry).toByteArray() ;
 	m_SplitterMapState		= settings.value(kKeyWindowState).toByteArray() ;
+	settings.endGroup();
+
+	settings.beginGroup("LabelImage") ;
+	m_LabelImageGeometry	= settings.value(kKeyWindowGeometry).toByteArray() ;
+	m_LabelImageState		= settings.value(kKeyWindowState).toByteArray() ;
+	settings.endGroup();
+
+	settings.beginGroup("ScrollAreaMap") ;
+	m_ScrollAreaMapGeometry	= settings.value(kKeyWindowGeometry).toByteArray() ;
 	settings.endGroup();
 }
 
@@ -43,8 +52,8 @@ void CSetting::writeSetting()
 	settings.beginGroup("Global");
 	settings.setValue(kKeyFileOpenDir, m_fileOpenDir) ;
 	settings.setValue(kKeyFileSaveDir, m_fileSaveDir) ;
-	settings.setValue(kKeyGridWidth, m_gridW) ;
-	settings.setValue(kKeyGridHeight, m_gridH) ;
+	settings.setValue(kKeyImageGridSize, m_imgGridSize) ;
+	settings.setValue(kKeyMapGridSize, m_mapGridSize) ;
 	settings.endGroup();
 
 	settings.beginGroup("MainWindow") ;
@@ -55,5 +64,14 @@ void CSetting::writeSetting()
 	settings.beginGroup("SplitterMap") ;
 	settings.setValue(kKeyWindowGeometry, m_SplitterMapGeometry) ;
 	settings.setValue(kKeyWindowState, m_SplitterMapState) ;
+	settings.endGroup();
+
+	settings.beginGroup("LabelImage") ;
+	settings.setValue(kKeyWindowGeometry, m_LabelImageGeometry) ;
+	settings.setValue(kKeyWindowState, m_LabelImageState) ;
+	settings.endGroup();
+
+	settings.beginGroup("ScrollAreaMap") ;
+	settings.setValue(kKeyWindowGeometry, m_ScrollAreaMapGeometry) ;
 	settings.endGroup();
 }

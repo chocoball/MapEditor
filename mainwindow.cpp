@@ -17,10 +17,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	setWindowTitle(kExecName);
 
 	QLabel *pLabelImage = new CImageLabel(this) ;
+	pLabelImage->show();
 	ui->scrollArea_Image->setWidget(pLabelImage);
 	g_EditData->setImageLabel(pLabelImage) ;
 
-	QLabel *pLabelMap = new CMapLabel(this) ;
+	CMapLabel *pLabelMap = new CMapLabel(this) ;
+	pLabelMap->show();
 	ui->scrollArea_Map->setWidget(pLabelMap) ;
 	g_EditData->setMapLabel(pLabelMap) ;
 	g_EditData->updateMap();
@@ -56,6 +58,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(m_pSplitterImage, SIGNAL(splitterMoved(int,int)), this, SLOT(slot_splitterMoveImage(int, int))) ;
 	connect(m_pSplitterMap, SIGNAL(splitterMoved(int,int)), this, SLOT(slot_splitterMoveMap(int, int))) ;
+	connect(pLabelImage, SIGNAL(sig_changeSelectGridRect()), pLabelMap, SLOT(slot_changeSelectGridRect())) ;
+	connect(ui->spinBox_grid_w_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridW(int))) ;
+	connect(ui->spinBox_grid_h_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridH(int))) ;
+	connect(ui->spinBox_grid_w_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridW(int))) ;
+	connect(ui->spinBox_grid_h_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridH(int))) ;
 }
 
 MainWindow::~MainWindow()
@@ -67,8 +74,6 @@ void MainWindow::closeEvent(QCloseEvent *)
 {
 	g_Setting->setMainWindowGeometry(saveGeometry()) ;
 	g_Setting->setMainWindowState(saveState(kVersion)) ;
-	g_Setting->setSplitterMapGeometry(m_pSplitterMap->saveGeometry()) ;
-	g_Setting->setSplitterMapState(m_pSplitterMap->saveState()) ;
 	g_Setting->writeSetting();
 }
 
@@ -77,7 +82,6 @@ void MainWindow::resizeEvent(QResizeEvent *)
 	QSize size = this->size() - m_windowSpace ;
 	m_pSplitterMap->resize(size) ;
 
-	slot_splitterMoveImage(0, 0) ;
 	slot_splitterMoveMap(0, 0);
 }
 
@@ -135,6 +139,46 @@ void MainWindow::slot_splitterMoveMap(int, int)
 	slot_splitterMoveImage(0, 0) ;
 }
 
+void MainWindow::slot_changeImageGridW(int val)
+{
+	QSize size = g_Setting->getImageGridSize() ;
+	if ( size.width() == val ) { return ; }
+
+	size.setWidth(val) ;
+	g_Setting->setImageGridSize(size) ;
+	g_EditData->updateImage();
+}
+
+void MainWindow::slot_changeImageGridH(int val)
+{
+	QSize size = g_Setting->getImageGridSize() ;
+	if ( size.height() == val ) { return ; }
+
+	size.setHeight(val) ;
+	g_Setting->setImageGridSize(size) ;
+	g_EditData->updateImage();
+}
+
+void MainWindow::slot_changeMapGridW(int val)
+{
+	QSize size = g_Setting->getMapGridSize() ;
+	if ( size.width() == val ) { return ; }
+
+	size.setWidth(val) ;
+	g_Setting->setMapGridSize(size) ;
+	g_EditData->updateMap();
+}
+
+void MainWindow::slot_changeMapGridH(int val)
+{
+	QSize size = g_Setting->getMapGridSize() ;
+	if ( size.height() == val ) { return ; }
+
+	size.setHeight(val) ;
+	g_Setting->setMapGridSize(size) ;
+	g_EditData->updateMap();
+}
+
 
 // ファイルを開く
 void MainWindow::fileOpen(QString &fileName)
@@ -173,13 +217,15 @@ void MainWindow::fileWrite(QString &fileName)
 
 void MainWindow::restoreSettings()
 {
-	ui->spinBox_grid_w->setValue(g_Setting->getGridW()) ;
-	ui->spinBox_grid_h->setValue(g_Setting->getGridH()) ;
+	ui->spinBox_grid_w_img->setValue(g_Setting->getImageGridSize().width()) ;
+	ui->spinBox_grid_h_img->setValue(g_Setting->getImageGridSize().height()) ;
+	ui->spinBox_grid_w_map->setValue(g_Setting->getMapGridSize().width()) ;
+	ui->spinBox_grid_h_map->setValue(g_Setting->getMapGridSize().height()) ;
 
 	restoreState(g_Setting->getMainWindowState()) ;
 	restoreGeometry(g_Setting->getMainWindowGeometry()) ;
 
-	slot_splitterMoveMap(0, 0);
+//	slot_splitterMoveMap(0, 0);
 }
 
 void MainWindow::setSpaceSize()

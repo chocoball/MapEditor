@@ -11,6 +11,7 @@ public:
 	~CImageLabel() ;
 
 signals:
+	void sig_changeSelectGridRect() ;
 
 public slots:
 
@@ -18,9 +19,6 @@ protected:
 	void mousePressEvent(QMouseEvent *ev) ;
 	void mouseMoveEvent(QMouseEvent *ev) ;
 	void mouseReleaseEvent(QMouseEvent *ev) ;
-
-private:
-	void startDrag(QPoint pos) ;
 
 private:
 	QPoint		m_selStart, m_selEnd ;

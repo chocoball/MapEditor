@@ -24,9 +24,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>330</y>
+      <y>360</y>
       <width>291</width>
-      <height>121</height>
+      <height>91</height>
      </rect>
     </property>
     <property name="title">
@@ -65,7 +65,7 @@
       <x>0</x>
       <y>0</y>
       <width>291</width>
-      <height>321</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -80,17 +80,17 @@
        <x>10</x>
        <y>0</y>
        <width>191</width>
-       <height>41</height>
+       <height>51</height>
       </rect>
      </property>
      <property name="title">
       <string>グリッドサイズ</string>
      </property>
-     <widget class="QSpinBox" name="spinBox_grid_h">
+     <widget class="QSpinBox" name="spinBox_grid_h_img">
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>10</y>
+        <y>20</y>
         <width>57</width>
         <height>25</height>
        </rect>
@@ -100,7 +100,7 @@
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>10</y>
+        <y>20</y>
         <width>16</width>
         <height>21</height>
        </rect>
@@ -113,7 +113,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
+        <y>20</y>
         <width>16</width>
         <height>21</height>
        </rect>
@@ -122,11 +122,11 @@
        <string>w</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="spinBox_grid_w">
+     <widget class="QSpinBox" name="spinBox_grid_w_img">
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>10</y>
+        <y>20</y>
         <width>57</width>
         <height>25</height>
        </rect>
@@ -137,7 +137,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
+       <y>50</y>
        <width>50</width>
        <height>12</height>
       </rect>
@@ -150,9 +150,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>70</y>
        <width>271</width>
-       <height>261</height>
+       <height>271</height>
       </rect>
      </property>
      <property name="widgetResizable">
@@ -189,9 +189,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
+       <y>70</y>
        <width>381</width>
-       <height>421</height>
+       <height>371</height>
       </rect>
      </property>
      <property name="widgetResizable">
@@ -203,7 +203,66 @@
         <x>0</x>
         <y>0</y>
         <width>377</width>
-        <height>417</height>
+        <height>367</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_grid_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>191</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>グリッドサイズ</string>
+     </property>
+     <widget class="QSpinBox" name="spinBox_grid_h_map">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>20</y>
+        <width>57</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>20</y>
+        <width>16</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>h</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>16</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>w</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_grid_w_map">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>20</y>
+        <width>57</width>
+        <height>25</height>
        </rect>
       </property>
      </widget>
@@ -212,9 +271,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>2</y>
-       <width>50</width>
-       <height>20</height>
+       <y>50</y>
+       <width>31</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
