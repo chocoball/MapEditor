@@ -59,7 +59,10 @@ private:
 	QSplitter		*m_pSplitterImage ;
 	QSplitter		*m_pSplitterMap ;
 
-	QSize			m_frameImageSpace, m_frameMapSpace, m_windowSpace ;
+	QSize			m_frameImageSpace ;
+	QSize			m_frameMapSpace ;
+	QSize			m_windowSpace ;
+	QSize			m_frameTreeSpace ;
 };
 
 #endif // MAINWINDOW_H

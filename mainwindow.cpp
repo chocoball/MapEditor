@@ -32,19 +32,18 @@ MainWindow::MainWindow(QWidget *parent) :
 	m_pSplitterImage->addWidget(ui->frame_image) ;
 	m_pSplitterImage->addWidget(ui->groupBox_setting);
 	m_pSplitterImage->setOrientation(Qt::Vertical);
-	QPoint pos = ui->frame_image->mapToParent(QPoint(0, 0)) ;
-	m_pSplitterImage->setGeometry(pos.x(),
-								  pos.y(),
+	m_pSplitterImage->setGeometry(0,
+								  0,
 								  ui->frame_image->width(),
-								  ui->groupBox_setting->y()+ui->groupBox_setting->height()-pos.y());
+								  ui->groupBox_setting->y()+ui->groupBox_setting->height());
 
 	m_pSplitterMap = new QSplitter(ui->centralWidget) ;
+	m_pSplitterMap->addWidget(ui->frame_tree);
 	m_pSplitterMap->addWidget(ui->frame_map);
 	m_pSplitterMap->addWidget(m_pSplitterImage) ;
-	pos = m_pSplitterImage->mapToParent(QPoint(0, 0)) ;
-	m_pSplitterMap->setGeometry(pos.x(),
-								pos.y(),
-								m_pSplitterImage->width()+ui->frame_map->width(),
+	m_pSplitterMap->setGeometry(0,
+								0,
+								m_pSplitterImage->width()+ui->frame_map->width()+ui->frame_tree->width(),
 								ui->frame_map->height());
 
 	setSpaceSize() ;
@@ -70,7 +69,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(pLabelImage, SIGNAL(sig_changeSelectGridRect()), pLabelMap, SLOT(slot_changeSelectGridRect())) ;
 	connect(pLabelImage, SIGNAL(sig_changeSelectGridRect()), this, SLOT(slot_changeSelectGridRect())) ;
-
 
 	connect(this, SIGNAL(sig_keyPress(QKeyEvent*)), pLabelMap, SLOT(slot_keyPress(QKeyEvent*))) ;
 	connect(this, SIGNAL(sig_keyRelease(QKeyEvent*)), pLabelMap, SLOT(slot_keyRelease(QKeyEvent*))) ;
@@ -158,6 +156,12 @@ void MainWindow::slot_splitterMoveMap(int, int)
 	QSize size ;
 	size = ui->frame_map->size() - QSize(ui->scrollArea_Map->x(), ui->scrollArea_Map->y()) - m_frameMapSpace ;
 	ui->scrollArea_Map->resize(size) ;
+	size = ui->frame_tree->size() - QSize(ui->treeView->x(), ui->treeView->y()) - m_frameTreeSpace ;
+	ui->treeView->resize(size) ;
+
+	int y = 410 - 391 + ui->treeView->y() + ui->treeView->height() ;
+	ui->pushButton_add->move(ui->pushButton_add->x(), y) ;
+	ui->pushButton_del->move(ui->pushButton_del->x(), y) ;
 
 	slot_splitterMoveImage(0, 0) ;
 }
@@ -342,11 +346,8 @@ void MainWindow::restoreSettings()
 
 void MainWindow::setSpaceSize()
 {
-	m_frameImageSpace = QSize(291, 321) - QSize(10, 50) - QSize(271, 261) ;
-	m_frameMapSpace = QSize(401, 451) - QSize(10, 20) - QSize(381, 421) ;
-	m_windowSpace = QSize(700, 473) - QSize(692, 451) ;
-
-	qDebug() << "image space" << m_frameImageSpace ;
-	qDebug() << "map space" << m_frameMapSpace ;
-	qDebug() << "window space" << m_windowSpace ;
+	m_frameImageSpace = QSize(10, 10) ;
+	m_frameMapSpace = QSize(10, 10) ;
+	m_frameTreeSpace = QSize(10, 60) ;
+	m_windowSpace = QSize(10, 36) ;
 }
