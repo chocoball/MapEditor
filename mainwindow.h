@@ -29,6 +29,11 @@ public slots:
 	void slot_changeMapGridW(int val) ;
 	void slot_changeMapGridH(int val) ;
 
+	void slot_clickCheckBoxUnit(bool val) ;
+	void slot_clickCheckBoxThrough(bool val) ;
+
+	void slot_changeSelectGridRect() ;
+
 signals:
 	void sig_keyPress(QKeyEvent *) ;
 	void sig_keyRelease(QKeyEvent *) ;

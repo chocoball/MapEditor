@@ -15,6 +15,12 @@ public:
 		int				data ;
 	} GridData ;
 
+	typedef struct {
+		QPoint			grid ;
+		bool			bUnitable ;	// ユニット配置可能なら true
+		bool			bThrough ;	// 敵通行可能なら true
+	} ImageData ;
+
 private:
     CEditData() ;
 
@@ -38,35 +44,19 @@ public:
 	bool indexToGrid(QPoint &ret, int index, const QSize &gridSize) ;
 	int gridToIndex(const QPoint grid, const QSize &gridSize) ;
 
-	void addGridData(QPoint mapGrid, QPoint imgGrid, int data)
-	{
-		removeGridData(mapGrid) ;
+	// GridData -------------------------------------------------------
+	void addGridData(QPoint mapGrid, QPoint imgGrid, int data) ;
+	int getGridDataIndex(QPoint mapGrid) ;
+	GridData &getGridData(int index) ;
+	void removeGridData(QPoint mapGrid) ;
+	// ----------------------------------------------------------------
 
-		GridData d ;
-		d.mapGrid = mapGrid ;
-		d.imageGrid = imgGrid ;
-		d.data = data ;
-		m_gridData.push_back(d) ;
-	}
-	int getGridDataIndex(QPoint mapGrid)
-	{
-		for ( int i = 0 ; i < m_gridData.size() ; i ++ ) {
-			if ( m_gridData[i].mapGrid == mapGrid ) { return i ; }
-		}
-		return -1 ;
-	}
-	GridData &getGridData(int index)
-	{
-		return m_gridData[index] ;
-	}
-
-	void removeGridData(QPoint mapGrid)
-	{
-		int idx = getGridDataIndex(mapGrid) ;
-		if ( idx >= 0 ) {
-			m_gridData.takeAt(idx) ;
-		}
-	}
+	// ImageData ------------------------------------------------------
+	void addImageData(QPoint imgGrid, bool bUnit, bool bThrough) ;
+	int getImageDataIndex(QPoint imgGrid) ;
+	ImageData &getImageData(int index) ;
+	void removeImageData(QPoint imgGrid) ;
+	// ----------------------------------------------------------------
 
 	kGetterSetter(QPoint, m_selStartGrid, SelStartGrid)
 	kGetterSetter(QPoint, m_selEndGrid, SelEndGrid)
@@ -74,9 +64,10 @@ public:
 	kGetterSetter(CMapLabel*, m_pMapLabel, MapLabel)
 
 private:
-	QImage			m_Image ;
+	QImage				m_Image ;
 
-	QList<GridData>	m_gridData ;
+	QList<GridData>		m_gridData ;
+	QList<ImageData>	m_imgData ;
 };
 
 #define g_EditData CEditData::getInstance()

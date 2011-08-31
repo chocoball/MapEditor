@@ -3,6 +3,7 @@
 #include "include.h"
 #include "cimagelabel.h"
 #include "cmaplabel.h"
+#include "csavefile.h"
 
 #define kExecName		"MapEditor"
 #define kVersion		0x00000000
@@ -56,13 +57,21 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->action_Save,	SIGNAL(triggered()), this, SLOT(slot_fileSave())) ;
 	connect(ui->action_SaveAs,	SIGNAL(triggered()), this, SLOT(slot_fileSaveAs())) ;
 
-	connect(m_pSplitterImage, SIGNAL(splitterMoved(int,int)), this, SLOT(slot_splitterMoveImage(int, int))) ;
-	connect(m_pSplitterMap, SIGNAL(splitterMoved(int,int)), this, SLOT(slot_splitterMoveMap(int, int))) ;
-	connect(pLabelImage, SIGNAL(sig_changeSelectGridRect()), pLabelMap, SLOT(slot_changeSelectGridRect())) ;
 	connect(ui->spinBox_grid_w_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridW(int))) ;
 	connect(ui->spinBox_grid_h_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridH(int))) ;
 	connect(ui->spinBox_grid_w_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridW(int))) ;
 	connect(ui->spinBox_grid_h_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridH(int))) ;
+
+	connect(ui->checkBox_unit, SIGNAL(clicked(bool)), this, SLOT(slot_clickCheckBoxUnit(bool))) ;
+	connect(ui->checkBox_through, SIGNAL(clicked(bool)), this, SLOT(slot_clickCheckBoxThrough(bool))) ;
+
+	connect(m_pSplitterImage, SIGNAL(splitterMoved(int,int)), this, SLOT(slot_splitterMoveImage(int, int))) ;
+	connect(m_pSplitterMap, SIGNAL(splitterMoved(int,int)), this, SLOT(slot_splitterMoveMap(int, int))) ;
+
+	connect(pLabelImage, SIGNAL(sig_changeSelectGridRect()), pLabelMap, SLOT(slot_changeSelectGridRect())) ;
+	connect(pLabelImage, SIGNAL(sig_changeSelectGridRect()), this, SLOT(slot_changeSelectGridRect())) ;
+
+
 	connect(this, SIGNAL(sig_keyPress(QKeyEvent*)), pLabelMap, SLOT(slot_keyPress(QKeyEvent*))) ;
 	connect(this, SIGNAL(sig_keyRelease(QKeyEvent*)), pLabelMap, SLOT(slot_keyRelease(QKeyEvent*))) ;
 }
@@ -135,6 +144,7 @@ void MainWindow::slot_fileSaveAs()
 	fileWrite(str) ;
 }
 
+// Image frame 幅変更
 void MainWindow::slot_splitterMoveImage(int, int)
 {
 	QSize size ;
@@ -142,6 +152,7 @@ void MainWindow::slot_splitterMoveImage(int, int)
 	ui->scrollArea_Image->resize(size) ;
 }
 
+// Map frame 幅変更
 void MainWindow::slot_splitterMoveMap(int, int)
 {
 	QSize size ;
@@ -151,6 +162,7 @@ void MainWindow::slot_splitterMoveMap(int, int)
 	slot_splitterMoveImage(0, 0) ;
 }
 
+// image grid w 変更
 void MainWindow::slot_changeImageGridW(int val)
 {
 	QSize size = g_Setting->getImageGridSize() ;
@@ -161,6 +173,7 @@ void MainWindow::slot_changeImageGridW(int val)
 	g_EditData->updateImage();
 }
 
+// image grid h 変更
 void MainWindow::slot_changeImageGridH(int val)
 {
 	QSize size = g_Setting->getImageGridSize() ;
@@ -171,6 +184,7 @@ void MainWindow::slot_changeImageGridH(int val)
 	g_EditData->updateImage();
 }
 
+// map grid w 変更
 void MainWindow::slot_changeMapGridW(int val)
 {
 	QSize size = g_Setting->getMapGridSize() ;
@@ -181,6 +195,7 @@ void MainWindow::slot_changeMapGridW(int val)
 	g_EditData->updateMap();
 }
 
+// map grid h 変更
 void MainWindow::slot_changeMapGridH(int val)
 {
 	QSize size = g_Setting->getMapGridSize() ;
@@ -191,6 +206,89 @@ void MainWindow::slot_changeMapGridH(int val)
 	g_EditData->updateMap();
 }
 
+// ユニット配置 チェックボックス変更
+void MainWindow::slot_clickCheckBoxUnit(bool val)
+{
+	qDebug() << "slot_clickCheckBoxUnit" << val ;
+
+	ui->checkBox_unit->setCheckState(val ? Qt::Checked : Qt::Unchecked) ;
+
+	QPoint st = g_EditData->getSelStartGrid() ;
+	QPoint end = g_EditData->getSelEndGrid() ;
+	for ( int y = st.y() ; y <= end.y() ; y ++ ) {
+		for ( int x = st.x() ; x <= end.x() ; x ++ ) {
+			QPoint grid = QPoint(x, y) ;
+			int index = g_EditData->getImageDataIndex(grid);
+			if ( index >= 0 ) {
+				CEditData::ImageData &data = g_EditData->getImageData(index) ;
+				data.bUnitable = val ;
+			}
+			else {
+				g_EditData->addImageData(grid, val, false) ;
+			}
+		}
+	}
+}
+
+// 敵通過 チェックボックス変更
+void MainWindow::slot_clickCheckBoxThrough(bool val)
+{
+	ui->checkBox_through->setCheckState(val ? Qt::Checked : Qt::Unchecked) ;
+
+	QPoint st = g_EditData->getSelStartGrid() ;
+	QPoint end = g_EditData->getSelEndGrid() ;
+	for ( int y = st.y() ; y <= end.y() ; y ++ ) {
+		for ( int x = st.x() ; x <= end.x() ; x ++ ) {
+			QPoint grid = QPoint(x, y) ;
+			int index = g_EditData->getImageDataIndex(grid);
+			if ( index >= 0 ) {
+				CEditData::ImageData &data = g_EditData->getImageData(index) ;
+				data.bThrough = val ;
+			}
+			else {
+				g_EditData->addImageData(grid, false, val) ;
+			}
+		}
+	}
+}
+
+// image label 選択グリッド変更
+void MainWindow::slot_changeSelectGridRect()
+{
+	bool bUnit = false, bThrough = false ;
+	QPoint st = g_EditData->getSelStartGrid() ;
+	QPoint end = g_EditData->getSelEndGrid() ;
+	for ( int y = st.y() ; y <= end.y() ; y ++ ) {
+		for ( int x = st.x() ; x <= end.x() ; x ++ ) {
+			QPoint grid = QPoint(x, y) ;
+			int index = g_EditData->getImageDataIndex(grid);
+			if ( index < 0 ) { continue ; }
+
+			CEditData::ImageData &data = g_EditData->getImageData(index) ;
+			if ( data.bUnitable ) { bUnit = data.bUnitable ; }
+			if ( data.bThrough ) { bThrough = data.bThrough ; }
+		}
+	}
+
+	if ( st.x() != end.x() || st.y() != end.y() ) {
+		if ( bUnit ) {
+			ui->checkBox_unit->setCheckState(Qt::PartiallyChecked);
+		}
+		else {
+			ui->checkBox_unit->setChecked(false) ;
+		}
+		if ( bThrough ) {
+			ui->checkBox_through->setCheckState(Qt::PartiallyChecked);
+		}
+		else {
+			ui->checkBox_through->setChecked(false);
+		}
+	}
+	else {
+		ui->checkBox_unit->setChecked(bUnit) ;
+		ui->checkBox_through->setChecked(bThrough);
+	}
+}
 
 // ファイルを開く
 void MainWindow::fileOpen(QString &fileName)
@@ -224,7 +322,9 @@ void MainWindow::fileOpen(QString &fileName)
 // ファイル保存
 void MainWindow::fileWrite(QString &fileName)
 {
-	g_Setting->setFileSaveDir(fileName) ;
+	if ( fileName.indexOf(kFileExt_JSON) > 0 ) {
+		g_Setting->setFileSaveDir(fileName) ;
+	}
 }
 
 void MainWindow::restoreSettings()

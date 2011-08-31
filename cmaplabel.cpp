@@ -24,6 +24,7 @@ void CMapLabel::updateLabels()
 	m_pGridLabel->updateGrid() ;
 
 	m_pMapLabel->resize(m_pGridLabel->size());
+	setMinimumSize(m_pGridLabel->size());
 }
 
 void CMapLabel::slot_changeSelectGridRect()

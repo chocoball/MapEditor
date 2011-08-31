@@ -16,7 +16,8 @@ SOURCES		+=	main.cpp		\
 				ceditdata.cpp	\
 				cimagelabel.cpp	\
 				cmaplabel.cpp	\
-				cgridlabel.cpp
+				cgridlabel.cpp	\
+				csavefile.cpp
 
 HEADERS		+=	mainwindow.h	\
 				csetting.h		\
@@ -24,6 +25,7 @@ HEADERS		+=	mainwindow.h	\
 				include.h		\
 				cimagelabel.h	\
 				cmaplabel.h		\
-				cgridlabel.h
+				cgridlabel.h	\
+				csavefile.h
 
 FORMS		+=	mainwindow.ui

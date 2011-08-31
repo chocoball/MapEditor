@@ -32,7 +32,7 @@
     <property name="title">
      <string>設定</string>
     </property>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="checkBox_unit">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -45,7 +45,7 @@
       <string>ユニット設置可能</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox_2">
+    <widget class="QCheckBox" name="checkBox_through">
      <property name="geometry">
       <rect>
        <x>10</x>

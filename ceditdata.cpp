@@ -16,35 +16,9 @@ void CEditData::update()
 void CEditData::updateMap()
 {
 	qDebug() << "pMapLabel:" << m_pMapLabel ;
-#if 1
+
 	if ( !m_pMapLabel ) { return ; }
 	m_pMapLabel->updateLabels() ;
-
-	int gridW = g_Setting->getMapGridSize().width() ;
-	int gridH = g_Setting->getMapGridSize().height() ;
-	QImage img = QImage(gridW*100, gridH*100, QImage::Format_ARGB32) ;
-	m_pMapLabel->setPixmap(QPixmap::fromImage(img)) ;
-	m_pMapLabel->resize(img.size());
-
-#else
-	int gridW = g_Setting->getMapGridSize().width() ;
-	int gridH = g_Setting->getMapGridSize().height() ;
-	QImage img = QImage(gridW*100, gridH*100, QImage::Format_ARGB32) ;
-	QColor col(0, 0, 0) ;
-	for ( int y = 0 ; y < img.height() ; y += gridH ) {
-		for ( int x = 0 ; x < img.width() ; x ++ ) {
-			img.setPixel(x, y, col.rgba()) ;
-		}
-	}
-	for ( int x = 0 ; x < img.width() ; x += gridW ) {
-		for ( int y = 0 ; y < img.height() ; y ++ ) {
-			img.setPixel(x, y, col.rgba()) ;
-		}
-	}
-	QPixmap pix = QPixmap::fromImage(img) ;
-	m_pMapLabel->setPixmap(pix) ;
-	m_pMapLabel->resize(img.size());
-#endif
 }
 
 void CEditData::updateImage()
@@ -115,4 +89,68 @@ int CEditData::gridToIndex(const QPoint grid, const QSize &gridSize)
 	if ( grid.y() < 0 || grid.y() >= h ) { return -1 ; }
 
 	return grid.y() * w + grid.x() ;
+}
+
+void CEditData::addGridData(QPoint mapGrid, QPoint imgGrid, int data)
+{
+	removeGridData(mapGrid) ;
+
+	GridData d ;
+	d.mapGrid = mapGrid ;
+	d.imageGrid = imgGrid ;
+	d.data = data ;
+	m_gridData.push_back(d) ;
+}
+
+int CEditData::getGridDataIndex(QPoint mapGrid)
+{
+	for ( int i = 0 ; i < m_gridData.size() ; i ++ ) {
+		if ( m_gridData[i].mapGrid == mapGrid ) { return i ; }
+	}
+	return -1 ;
+}
+
+CEditData::GridData &CEditData::getGridData(int index)
+{
+	return m_gridData[index] ;
+}
+
+void CEditData::removeGridData(QPoint mapGrid)
+{
+	int idx = getGridDataIndex(mapGrid) ;
+	if ( idx >= 0 ) {
+		m_gridData.takeAt(idx) ;
+	}
+}
+
+void CEditData::addImageData(QPoint imgGrid, bool bUnit, bool bThrough)
+{
+	removeGridData(imgGrid) ;
+
+	ImageData d ;
+	d.grid = imgGrid ;
+	d.bUnitable = bUnit ;
+	d.bThrough = bThrough ;
+	m_imgData.push_back(d) ;
+}
+
+int CEditData::getImageDataIndex(QPoint imgGrid)
+{
+	for ( int i = 0 ; i < m_imgData.size() ; i ++ ) {
+		if ( m_imgData[i].grid == imgGrid ) { return i ; }
+	}
+	return -1 ;
+}
+
+CEditData::ImageData &CEditData::getImageData(int index)
+{
+	return m_imgData[index] ;
+}
+
+void CEditData::removeImageData(QPoint imgGrid)
+{
+	int idx = getImageDataIndex(imgGrid) ;
+	if ( idx >= 0 ) {
+		m_imgData.takeAt(idx) ;
+	}
 }
