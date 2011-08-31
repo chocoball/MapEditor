@@ -10,6 +10,15 @@ class CMapLabel : public QLabel
 {
     Q_OBJECT
 public:
+	enum {
+		kMapControll_None = 0,
+		kMapControll_Add,
+		kMapControll_Remove,
+		kMapControll_AddMulti,
+		kMapControll_RemoveMulti,
+	} ;
+
+public:
 	explicit CMapLabel(QWidget *parent = 0);
 
 	void updateLabels() ;
@@ -21,6 +30,8 @@ public slots:
 	void slot_mouseMove(QMouseEvent *event) ;
 	void slot_mouseRelease(QMouseEvent *event) ;
 
+	void slot_keyPress(QKeyEvent*) ;
+	void slot_keyRelease(QKeyEvent*) ;
 protected:
 
 private:
@@ -31,15 +42,19 @@ private:
 
 	int getGridLabelIndex(QPoint grid) ;
 
-	void addMapGrid(const QPoint mapPos) ;
-	void makeDropLabel(QPoint pos) ;
+	void addMapGrid(const QPoint basePos) ;
+	void removeMapGrid(const QPoint basePos) ;
+	void makeDropLabel(QPoint pos, QPoint gridSt, QPoint gridEnd) ;
 
 private:
-	bool				m_bMousePress ;
+	bool				m_bPressCtrl ;
+	int					m_nMapControllType ;
+	bool				m_bMousePressLeft, m_bMousePressRight ;
 	QList<GridLabel>	m_GridLabel ;
+	QLabel				*m_pMapLabel ;
 	QLabel				*m_pDropLabel ;
 	CGridLabel			*m_pGridLabel ;
-	QLabel				*m_pMapLabel ;
+	QSize				m_oldDropSize ;
 };
 
 #endif // CMAPLABEL_H

@@ -29,9 +29,16 @@ public slots:
 	void slot_changeMapGridW(int val) ;
 	void slot_changeMapGridH(int val) ;
 
+signals:
+	void sig_keyPress(QKeyEvent *) ;
+	void sig_keyRelease(QKeyEvent *) ;
+
 protected:
 	void closeEvent(QCloseEvent *) ;
 	void resizeEvent(QResizeEvent *) ;
+
+	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
 
 private:
 	void fileOpen(QString &fileName) ;

@@ -63,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->spinBox_grid_h_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridH(int))) ;
 	connect(ui->spinBox_grid_w_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridW(int))) ;
 	connect(ui->spinBox_grid_h_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridH(int))) ;
+	connect(this, SIGNAL(sig_keyPress(QKeyEvent*)), pLabelMap, SLOT(slot_keyPress(QKeyEvent*))) ;
+	connect(this, SIGNAL(sig_keyRelease(QKeyEvent*)), pLabelMap, SLOT(slot_keyRelease(QKeyEvent*))) ;
 }
 
 MainWindow::~MainWindow()
@@ -83,6 +85,16 @@ void MainWindow::resizeEvent(QResizeEvent *)
 	m_pSplitterMap->resize(size) ;
 
 	slot_splitterMoveMap(0, 0);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+	emit sig_keyPress(event) ;
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+	emit sig_keyRelease(event) ;
 }
 
 // 開く
