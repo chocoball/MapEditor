@@ -9,17 +9,98 @@ class CMapLabel ;
 class CEditData
 {
 public:
-	typedef struct {
+	typedef struct _tagGridData {
 		QPoint			mapGrid ;
 		QPoint			imageGrid ;
-		int				data ;
+		int				nTreasure ;
+
+		_tagGridData() {}
+		_tagGridData(QPoint mapGrid, QPoint imgGrid)
+		{
+			this->mapGrid = mapGrid ;
+			this->imageGrid = imgGrid ;
+			this->nTreasure = 0 ;
+		}
 	} GridData ;
 
-	typedef struct {
+	typedef struct _tagImageData {
 		QPoint			grid ;
 		bool			bUnitable ;	// ユニット配置可能なら true
 		bool			bThrough ;	// 敵通行可能なら true
+
+		_tagImageData() {}
+		_tagImageData(QPoint grid, bool bUnit, bool bThrough)
+		{
+			this->grid = grid ;
+			this->bUnitable = bUnit ;
+			this->bThrough = bThrough ;
+		}
 	} ImageData ;
+
+	typedef struct {
+		QList<GridData>		gridDatas ;
+		QList<ImageData>	imgDatas ;
+
+		// GridData -------------------------------------------------------
+		void addGridData(QPoint mapGrid, QPoint imgGrid)
+		{
+			removeGridData(mapGrid) ;
+
+			gridDatas.append(GridData(mapGrid, imgGrid)) ;
+		}
+
+		int getGridDataIndex(QPoint mapGrid)
+		{
+			for ( int i = 0 ; i < gridDatas.size() ; i ++ ) {
+				if ( gridDatas[i].mapGrid == mapGrid ) { return i ; }
+			}
+			return -1 ;
+		}
+
+		GridData &getGridData(int index)
+		{
+			return gridDatas[index] ;
+		}
+
+		void removeGridData(QPoint mapGrid)
+		{
+			int i = getGridDataIndex(mapGrid) ;
+			if ( i < 0 ) { return ; }
+			gridDatas.takeAt(i) ;
+		}
+
+		// ImageData ------------------------------------------------------
+		void addImageData(QPoint imgGrid, bool bUnit, bool bThrough)
+		{
+			removeImageData(imgGrid) ;
+			imgDatas.append(ImageData(imgGrid, bUnit, bThrough)) ;
+		}
+
+		int getImageDataIndex(QPoint imgGrid)
+		{
+			for ( int i = 0 ; i < imgDatas.size() ; i ++ ) {
+				if ( imgDatas[i].grid == imgGrid ) { return i ; }
+			}
+			return -1 ;
+		}
+
+		ImageData &getImageData(int index)
+		{
+			return imgDatas[index] ;
+		}
+
+		void removeImageData(QPoint imgGrid)
+		{
+			int i = getImageDataIndex(imgGrid) ;
+			if ( i < 0 ) { return ; }
+			imgDatas.takeAt(i) ;
+		}
+		// ----------------------------------------------------------------
+	} EditData ;
+
+	typedef QStandardItem*				EditDataID ;
+	typedef QPair<EditDataID, EditData>	EditDataGroup ;
+	typedef QList<EditDataGroup>		EditDataGroupList ;
 
 private:
     CEditData() ;
@@ -44,30 +125,29 @@ public:
 	bool indexToGrid(QPoint &ret, int index, const QSize &gridSize) ;
 	int gridToIndex(const QPoint grid, const QSize &gridSize) ;
 
-	// GridData -------------------------------------------------------
-	void addGridData(QPoint mapGrid, QPoint imgGrid, int data) ;
-	int getGridDataIndex(QPoint mapGrid) ;
-	GridData &getGridData(int index) ;
-	void removeGridData(QPoint mapGrid) ;
-	// ----------------------------------------------------------------
+	int getEditDataIndex(EditDataID id)
+	{
+		for ( int i = 0 ; i < m_editDataGroups.size() ; i ++ ) {
+			EditDataGroup &group = m_editDataGroups[i] ;
+			if ( group.first == id ) { return i ; }
+		}
+		return -1 ;
+	}
 
-	// ImageData ------------------------------------------------------
-	void addImageData(QPoint imgGrid, bool bUnit, bool bThrough) ;
-	int getImageDataIndex(QPoint imgGrid) ;
-	ImageData &getImageData(int index) ;
-	void removeImageData(QPoint imgGrid) ;
-	// ----------------------------------------------------------------
+	EditData &getEditData(int index)
+	{
+		return m_editDataGroups[index].second ;
+	}
 
-	kGetterSetter(QPoint, m_selStartGrid, SelStartGrid)
-	kGetterSetter(QPoint, m_selEndGrid, SelEndGrid)
-	kGetterSetter(QLabel*, m_pImageLabel, ImageLabel)
-	kGetterSetter(CMapLabel*, m_pMapLabel, MapLabel)
+	kAccessor(QPoint, m_selStartGrid, SelStartGrid)
+	kAccessor(QPoint, m_selEndGrid, SelEndGrid)
+	kAccessor(QLabel*, m_pImageLabel, ImageLabel)
+	kAccessor(CMapLabel*, m_pMapLabel, MapLabel)
 
 private:
 	QImage				m_Image ;
 
-	QList<GridData>		m_gridData ;
-	QList<ImageData>	m_imgData ;
+	EditDataGroupList	m_editDataGroups ;
 };
 
 #define g_EditData CEditData::getInstance()

@@ -217,6 +217,7 @@ void MainWindow::slot_clickCheckBoxUnit(bool val)
 
 	ui->checkBox_unit->setCheckState(val ? Qt::Checked : Qt::Unchecked) ;
 
+#if 0	// TODO
 	QPoint st = g_EditData->getSelStartGrid() ;
 	QPoint end = g_EditData->getSelEndGrid() ;
 	for ( int y = st.y() ; y <= end.y() ; y ++ ) {
@@ -232,6 +233,7 @@ void MainWindow::slot_clickCheckBoxUnit(bool val)
 			}
 		}
 	}
+#endif
 }
 
 // 敵通過 チェックボックス変更
@@ -239,6 +241,7 @@ void MainWindow::slot_clickCheckBoxThrough(bool val)
 {
 	ui->checkBox_through->setCheckState(val ? Qt::Checked : Qt::Unchecked) ;
 
+#if 0	// TODO
 	QPoint st = g_EditData->getSelStartGrid() ;
 	QPoint end = g_EditData->getSelEndGrid() ;
 	for ( int y = st.y() ; y <= end.y() ; y ++ ) {
@@ -254,11 +257,13 @@ void MainWindow::slot_clickCheckBoxThrough(bool val)
 			}
 		}
 	}
+#endif
 }
 
 // image label 選択グリッド変更
 void MainWindow::slot_changeSelectGridRect()
 {
+#if 0	// TODO
 	bool bUnit = false, bThrough = false ;
 	QPoint st = g_EditData->getSelStartGrid() ;
 	QPoint end = g_EditData->getSelEndGrid() ;
@@ -292,6 +297,7 @@ void MainWindow::slot_changeSelectGridRect()
 		ui->checkBox_unit->setChecked(bUnit) ;
 		ui->checkBox_through->setChecked(bThrough);
 	}
+#endif
 }
 
 // ファイルを開く

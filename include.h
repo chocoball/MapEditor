@@ -1,7 +1,7 @@
 #ifndef INCLUDE_H
 #define INCLUDE_H
 
-#define kGetterSetter(type, member, func_name)				\
+#define kAccessor(type, member, func_name)					\
 	public:													\
 		type get##func_name () { return member ; }			\
 		void set##func_name (type val) { member = val ; }	\

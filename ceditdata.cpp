@@ -23,6 +23,7 @@ void CEditData::updateMap()
 
 void CEditData::updateImage()
 {
+#if 0	// TODO
 	if ( !m_pImageLabel ) { return ; }
 
 	QSize gridSize = g_Setting->getImageGridSize() ;
@@ -54,6 +55,7 @@ void CEditData::updateImage()
 	}
 	m_pImageLabel->setPixmap(pix) ;
 	m_pImageLabel->resize(m_Image.size());
+#endif
 }
 
 bool CEditData::gridToPos(QPoint &ret, const QPoint &grid, const QSize &gridSize)
@@ -91,6 +93,7 @@ int CEditData::gridToIndex(const QPoint grid, const QSize &gridSize)
 	return grid.y() * w + grid.x() ;
 }
 
+#if 0
 void CEditData::addGridData(QPoint mapGrid, QPoint imgGrid, int data)
 {
 	removeGridData(mapGrid) ;
@@ -154,3 +157,4 @@ void CEditData::removeImageData(QPoint imgGrid)
 		m_imgData.takeAt(idx) ;
 	}
 }
+#endif

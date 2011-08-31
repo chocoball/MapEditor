@@ -190,7 +190,7 @@ void CMapLabel::addMapGrid(const QPoint basePos)
 			pLabel->show();
 			m_GridLabel.push_back(GridLabel(mapGrid, pLabel)) ;
 
-			g_EditData->addGridData(mapGrid, imgGrid, 0) ;
+//TODO			g_EditData->addGridData(mapGrid, imgGrid, 0) ;
 		}
 	}
 }
@@ -212,7 +212,7 @@ void CMapLabel::removeMapGrid(const QPoint basePos)
 				delete label.second ;
 			}
 
-			g_EditData->removeGridData(mapGrid) ;
+//TODO			g_EditData->removeGridData(mapGrid) ;
 		}
 	}
 }

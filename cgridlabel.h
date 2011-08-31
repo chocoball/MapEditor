@@ -12,8 +12,8 @@ public:
 
 	void updateGrid() ;
 
-	kGetterSetter(QSize, m_gridSize, GridSize)
-	kGetterSetter(QPoint, m_gridNum, GridNum)
+	kAccessor(QSize, m_gridSize, GridSize)
+	kAccessor(QPoint, m_gridNum, GridNum)
 
 signals:
 	void sig_mousePress(QMouseEvent *) ;
