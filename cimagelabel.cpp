@@ -4,6 +4,7 @@
 CImageLabel::CImageLabel(QWidget *parent) :
     QLabel(parent)
 {
+	setAcceptDrops(true) ;
 }
 
 CImageLabel::~CImageLabel()
@@ -12,14 +13,20 @@ CImageLabel::~CImageLabel()
 
 void CImageLabel::mousePressEvent(QMouseEvent *ev)
 {
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
 	m_selStart = ev->pos() ;
-	g_EditData->posToGrid(m_selGridSt, m_selStart, g_Setting->getImageGridSize()) ;
+	g_EditData->posToGrid(m_selGridSt, m_selStart, p->imgGridSize) ;
 }
 
 void CImageLabel::mouseMoveEvent(QMouseEvent *ev)
 {
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
 	m_selEnd = ev->pos() ;
-	g_EditData->posToGrid(m_selGridEnd, m_selEnd, g_Setting->getImageGridSize()) ;
+	g_EditData->posToGrid(m_selGridEnd, m_selEnd, p->imgGridSize) ;
 	g_EditData->setSelStartGrid(m_selGridSt) ;
 	g_EditData->setSelEndGrid(m_selGridEnd) ;
 	g_EditData->updateImage() ;
@@ -27,15 +34,15 @@ void CImageLabel::mouseMoveEvent(QMouseEvent *ev)
 
 void CImageLabel::mouseReleaseEvent(QMouseEvent *ev)
 {
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
 	m_selEnd = ev->pos() ;
-	g_EditData->posToGrid(m_selGridEnd, m_selEnd, g_Setting->getImageGridSize()) ;
+	g_EditData->posToGrid(m_selGridEnd, m_selEnd, p->imgGridSize) ;
 	g_EditData->setSelStartGrid(m_selGridSt) ;
 	g_EditData->setSelEndGrid(m_selGridEnd) ;
 	g_EditData->updateImage() ;
 
 	emit sig_changeSelectGridRect() ;
 }
-
-
-
 

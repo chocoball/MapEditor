@@ -19,12 +19,31 @@ CMapLabel::CMapLabel(QWidget *parent) :
 
 void CMapLabel::updateLabels()
 {
-	m_pGridLabel->setGridSize(g_Setting->getMapGridSize()) ;
-	m_pGridLabel->setGridNum(QPoint(100, 100)) ;
+	if ( !g_EditData->isSelectMap() ) { return ; }
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+	if ( p->image.isNull() ) { return ; }
+
+	qDebug() << "CMapLabel::updateLabels" ;
+
+	m_pGridLabel->setGridSize(p->mapGridSize) ;
+	m_pGridLabel->setGridNum(QPoint(50, 50)) ;
 	m_pGridLabel->updateGrid() ;
 
 	m_pMapLabel->resize(m_pGridLabel->size());
 	setMinimumSize(m_pGridLabel->size());
+
+	slot_changeSelectGridRect() ;
+
+	for ( int i = 0 ; i < m_TipLabel.size() ; i ++ ) {
+		delete m_TipLabel[i].second ;
+	}
+	m_TipLabel.clear() ;
+
+	for ( int i = 0 ; i < p->gridDatas.size() ; i ++ ) {
+		CEditData::GridData &data = p->gridDatas[i] ;
+		addMapGrid(data.mapGrid, data.imageGrid) ;
+	}
 }
 
 void CMapLabel::slot_changeSelectGridRect()
@@ -50,6 +69,8 @@ void CMapLabel::slot_mousePress(QMouseEvent *event)
 		break ;
 	}
 
+	qDebug() << "mousePress:" << m_nMapControllType ;
+
 	switch ( m_nMapControllType ) {
 	case kMapControll_AddMulti:
 	case kMapControll_RemoveMulti:
@@ -62,6 +83,9 @@ void CMapLabel::slot_mouseMove(QMouseEvent *event)
 {
 	if ( !m_pDropLabel ) { return ; }
 
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
 	switch ( m_nMapControllType ) {
 	case kMapControll_Add:
 		addMapGrid(event->pos()) ;
@@ -73,30 +97,36 @@ void CMapLabel::slot_mouseMove(QMouseEvent *event)
 	case kMapControll_RemoveMulti:
 		{
 			QPoint st, end ;
-			g_EditData->posToGrid(st, m_pDropLabel->pos(), g_Setting->getMapGridSize()) ;
+			g_EditData->posToGrid(st, m_pDropLabel->pos(), p->mapGridSize) ;
 			end = event->pos() - m_pDropLabel->pos() ;
 			end.setX((end.x() / m_oldDropSize.width() + 1) * m_oldDropSize.width()) ;
 			end.setY((end.y() / m_oldDropSize.height() + 1) * m_oldDropSize.height()) ;
 			end += m_pDropLabel->pos() ;
-			end.setX(end.x()-g_Setting->getMapGridSize().width()) ;
-			end.setY(end.y()-g_Setting->getMapGridSize().height()) ;
-			g_EditData->posToGrid(end, end, g_Setting->getMapGridSize()) ;
+			end.setX(end.x()-p->mapGridSize.width()) ;
+			end.setY(end.y()-p->mapGridSize.height()) ;
+			g_EditData->posToGrid(end, end, p->mapGridSize) ;
 			makeDropLabel(m_pDropLabel->pos(), st, end) ;
 		}
 		return ;
 	}
 
 	QPoint pos ;
-	g_EditData->posToGrid(pos, event->pos(), g_Setting->getMapGridSize()) ;
-	g_EditData->gridToPos(pos, pos, g_Setting->getMapGridSize()) ;
+	g_EditData->posToGrid(pos, event->pos(), p->mapGridSize) ;
+	g_EditData->gridToPos(pos, pos, p->mapGridSize) ;
 	m_pDropLabel->move(pos) ;
 }
 
 void CMapLabel::slot_mouseRelease(QMouseEvent *event)
 {
+	int type = m_nMapControllType ;
+	m_nMapControllType = kMapControll_None ;
+
 	if ( !m_pDropLabel ) { return ; }
 
-	switch ( m_nMapControllType ) {
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
+	switch ( type ) {
 	case kMapControll_Add:
 		addMapGrid(event->pos()) ;
 		break ;
@@ -106,21 +136,22 @@ void CMapLabel::slot_mouseRelease(QMouseEvent *event)
 	case kMapControll_AddMulti:
 	case kMapControll_RemoveMulti:
 		{
+/*
 			QPoint end ;
 			end = event->pos() - m_pDropLabel->pos() ;
 			end.setX((end.x() / m_oldDropSize.width() + 1) * m_oldDropSize.width()) ;
 			end.setY((end.y() / m_oldDropSize.height() + 1) * m_oldDropSize.height()) ;
 			end += m_pDropLabel->pos() ;
-			end.setX(end.x()-g_Setting->getMapGridSize().width()) ;
-			end.setY(end.y()-g_Setting->getMapGridSize().height()) ;
-			g_EditData->posToGrid(end, end, g_Setting->getMapGridSize()) ;
-
+			end.setX(end.x()-p->mapGridSize.width()) ;
+			end.setY(end.y()-p->mapGridSize.height()) ;
+			g_EditData->posToGrid(end, end, p->mapGridSize) ;
+*/
 			for ( int y = m_pDropLabel->pos().y() ; y < event->pos().y() ; y += m_oldDropSize.height() ) {
 				for ( int x = m_pDropLabel->pos().x() ; x < event->pos().x() ; x += m_oldDropSize.width() ) {
-					if ( m_nMapControllType == kMapControll_AddMulti ) {
+					if ( type == kMapControll_AddMulti ) {
 						addMapGrid(QPoint(x, y)) ;
 					}
-					else if ( m_nMapControllType == kMapControll_RemoveMulti ) {
+					else if ( type == kMapControll_RemoveMulti ) {
 						removeMapGrid(QPoint(x, y)) ;
 					}
 				}
@@ -130,8 +161,6 @@ void CMapLabel::slot_mouseRelease(QMouseEvent *event)
 		}
 		break ;
 	}
-
-	m_nMapControllType = kMapControll_None ;
 }
 
 void CMapLabel::slot_keyPress(QKeyEvent *event)
@@ -150,8 +179,8 @@ void CMapLabel::slot_keyRelease(QKeyEvent *event)
 
 int CMapLabel::getGridLabelIndex(QPoint grid)
 {
-	for ( int i = 0 ; i < m_GridLabel.size() ; i ++ ) {
-		if ( m_GridLabel[i].first == grid ) {
+	for ( int i = 0 ; i < m_TipLabel.size() ; i ++ ) {
+		if ( m_TipLabel[i].first == grid ) {
 			return i ;
 		}
 	}
@@ -160,46 +189,67 @@ int CMapLabel::getGridLabelIndex(QPoint grid)
 
 void CMapLabel::addMapGrid(const QPoint basePos)
 {
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
+	qDebug() << "addMapGrid:" << basePos ;
+
 	QPoint st_grid, end_grid, base_grid ;
 
-	QImage *pImage = g_EditData->getImagePtr() ;
-	QSize imgGridSize = g_Setting->getImageGridSize() ;
-
-	g_EditData->posToGrid(base_grid, basePos, g_Setting->getMapGridSize()) ;
+	g_EditData->posToGrid(base_grid, basePos, p->mapGridSize) ;
 	st_grid = g_EditData->getSelStartGrid() ;
 	end_grid = g_EditData->getSelEndGrid() ;
 	for ( int y = st_grid.y() ; y <= end_grid.y() ; y ++ ) {
 		for ( int x = st_grid.x() ; x <= end_grid.x() ; x ++ ) {
-
 			QPoint imgGrid = QPoint(x, y) ;
 			QPoint mapGrid = base_grid + QPoint(x-st_grid.x(), y-st_grid.y()) ;
-			QPoint imgPos, mapPos ;
-			g_EditData->gridToPos(imgPos, imgGrid, imgGridSize) ;
-			g_EditData->gridToPos(mapPos, mapGrid, g_Setting->getMapGridSize()) ;
-			QImage img = pImage->copy(imgPos.x(), imgPos.y(), imgGridSize.width(), imgGridSize.height()).scaled(g_Setting->getMapGridSize()) ;
+			addMapGrid(mapGrid, imgGrid) ;
 
-			int index = getGridLabelIndex(mapGrid) ;
-			if ( index >= 0 ) {
-				GridLabel label = m_GridLabel.takeAt(index) ;
-				delete label.second ;
-			}
-
-			QLabel *pLabel = new QLabel(m_pMapLabel) ;
-			pLabel->move(mapPos) ;
-			pLabel->setPixmap(QPixmap::fromImage(img)) ;
-			pLabel->show();
-			m_GridLabel.push_back(GridLabel(mapGrid, pLabel)) ;
-
-//TODO			g_EditData->addGridData(mapGrid, imgGrid, 0) ;
+			p->addGridData(mapGrid, imgGrid) ;
 		}
 	}
 }
 
+void CMapLabel::addMapGrid(const QPoint mapGrid, const QPoint imgGrid)
+{
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) {
+		qDebug() << "CMapLabel::addMapGrid p==null" ;
+		return ;
+	}
+
+	QPoint mapPos, imgPos ;
+	QSize mapGridSize = p->mapGridSize ;
+	QSize imgGridSize = p->imgGridSize ;
+	g_EditData->gridToPos(mapPos, mapGrid, mapGridSize) ;
+	g_EditData->gridToPos(imgPos, imgGrid, imgGridSize) ;
+
+	QImage img = p->image.copy(imgPos.x(), imgPos.y(), imgGridSize.width(), imgGridSize.height()) ;
+
+	int index = getGridLabelIndex(mapGrid) ;
+	if ( index >= 0 ) {
+		TipLabel label = m_TipLabel.takeAt(index) ;
+		delete label.second ;
+	}
+
+	QLabel *pLabel = new QLabel(m_pMapLabel) ;
+	pLabel->move(mapPos) ;
+	pLabel->setPixmap(QPixmap::fromImage(img.scaled(mapGridSize))) ;
+	pLabel->show();
+	m_TipLabel.append(TipLabel(mapGrid, pLabel)) ;
+}
+
 void CMapLabel::removeMapGrid(const QPoint basePos)
 {
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) {
+		qDebug() << "CMapLabel::removeMapGrid p==null" ;
+		return ;
+	}
+
 	QPoint st_grid, end_grid, base_grid ;
 
-	g_EditData->posToGrid(base_grid, basePos, g_Setting->getMapGridSize()) ;
+	g_EditData->posToGrid(base_grid, basePos, p->mapGridSize) ;
 	st_grid = g_EditData->getSelStartGrid() ;
 	end_grid = g_EditData->getSelEndGrid() ;
 	for ( int y = st_grid.y() ; y <= end_grid.y() ; y ++ ) {
@@ -208,11 +258,11 @@ void CMapLabel::removeMapGrid(const QPoint basePos)
 
 			int index = getGridLabelIndex(mapGrid) ;
 			if ( index >= 0 ) {
-				GridLabel label = m_GridLabel.takeAt(index) ;
+				TipLabel label = m_TipLabel.takeAt(index) ;
 				delete label.second ;
 			}
 
-//TODO			g_EditData->removeGridData(mapGrid) ;
+			p->removeGridData(mapGrid) ;
 		}
 	}
 }
@@ -222,22 +272,24 @@ void CMapLabel::makeDropLabel(QPoint pos, QPoint gridSt, QPoint gridEnd)
 	if ( !m_pDropLabel ) {
 		m_pDropLabel = new QLabel(this) ;
 	}
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
 
 	QPoint st, end ;
-	g_EditData->gridToPos(st, gridSt, g_Setting->getMapGridSize()) ;
-	g_EditData->gridToPos(end, gridEnd, g_Setting->getMapGridSize()) ;
-	g_EditData->posToGrid(pos, pos, g_Setting->getMapGridSize()) ;
-	g_EditData->gridToPos(pos, pos, g_Setting->getMapGridSize()) ;
-	end.setX(end.x() + g_Setting->getMapGridSize().width()) ;
-	end.setY(end.y() + g_Setting->getMapGridSize().height()) ;
+	g_EditData->gridToPos(st, gridSt, p->mapGridSize) ;
+	g_EditData->gridToPos(end, gridEnd, p->mapGridSize) ;
+	g_EditData->posToGrid(pos, pos, p->mapGridSize) ;
+	g_EditData->gridToPos(pos, pos, p->mapGridSize) ;
+	end.setX(end.x() + p->mapGridSize.width()) ;
+	end.setY(end.y() + p->mapGridSize.height()) ;
 
 	m_pDropLabel->move(pos) ;
 	QSize size = QSize(end.x()-st.x(), end.y()-st.y()) ;
-	QImage img = QImage(QSize(4, 4), QImage::Format_ARGB32) ;
+	QImage img = QImage(size, QImage::Format_ARGB32) ;
 	for ( int i = 0 ; i < img.width()*img.height() ; i ++ ) {
 		img.setPixel(i%img.width(), i/img.width(), QColor(255, 0, 0, 64).rgba()) ;
 	}
-	m_pDropLabel->setPixmap(QPixmap::fromImage(img.scaled(size)));
+	m_pDropLabel->setPixmap(QPixmap::fromImage(img));
 	m_pDropLabel->resize(size) ;
 	m_pDropLabel->show();
 }

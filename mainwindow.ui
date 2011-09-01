@@ -20,52 +20,13 @@
    <string/>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QGroupBox" name="groupBox_setting">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>360</y>
-      <width>291</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>設定</string>
-    </property>
-    <widget class="QCheckBox" name="checkBox_unit">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>131</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>ユニット設置可能</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="checkBox_through">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>101</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>敵通行可能</string>
-     </property>
-    </widget>
-   </widget>
    <widget class="QFrame" name="frame_image">
     <property name="geometry">
      <rect>
       <x>540</x>
       <y>10</y>
       <width>291</width>
-      <height>341</height>
+      <height>441</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -146,13 +107,13 @@
       <string>Image</string>
      </property>
     </widget>
-    <widget class="QScrollArea" name="scrollArea_Image">
+    <widget class="CScrollAreaImage" name="scrollArea_Image">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>70</y>
        <width>271</width>
-       <height>261</height>
+       <height>281</height>
       </rect>
      </property>
      <property name="widgetResizable">
@@ -166,6 +127,45 @@
         <width>287</width>
         <height>267</height>
        </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_setting">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>360</y>
+       <width>271</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>設定</string>
+     </property>
+     <widget class="QCheckBox" name="checkBox_unit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>131</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ユニット設置可能</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_through">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>101</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>敵通行可能</string>
       </property>
      </widget>
     </widget>
@@ -290,22 +290,18 @@
       <height>441</height>
      </rect>
     </property>
+    <property name="minimumSize">
+     <size>
+      <width>121</width>
+      <height>0</height>
+     </size>
+    </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QTreeView" name="treeView">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>101</width>
-       <height>391</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QPushButton" name="pushButton_add">
      <property name="geometry">
       <rect>
@@ -330,6 +326,16 @@
      </property>
      <property name="text">
       <string>削除</string>
+     </property>
+    </widget>
+    <widget class="QTreeView" name="treeView">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>101</width>
+       <height>391</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -370,6 +376,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>CScrollAreaImage</class>
+   <extends>QScrollArea</extends>
+   <header location="global">cscrollareaimage.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

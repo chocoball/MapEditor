@@ -15,25 +15,24 @@ void CEditData::update()
 
 void CEditData::updateMap()
 {
-	qDebug() << "pMapLabel:" << m_pMapLabel ;
-
 	if ( !m_pMapLabel ) { return ; }
 	m_pMapLabel->updateLabels() ;
 }
 
 void CEditData::updateImage()
 {
-#if 0	// TODO
+#if 1
 	if ( !m_pImageLabel ) { return ; }
+	MapData *p = getSelectMapData() ;
+	if ( !p ) { return ; }
+	if ( p->image.isNull() ) { return ; }
 
-	QSize gridSize = g_Setting->getImageGridSize() ;
-	int w = m_Image.width() / gridSize.width() ;
-	int h = m_Image.height() / gridSize.height() ;
-	m_gridData.reserve(w*h) ;
+	QSize gridSize = p->imgGridSize ;
 
 	int gridW = gridSize.width() ;
 	int gridH = gridSize.height() ;
-	QImage image = getImage() ;
+	QImage &image = p->image ;
+
 	QImage img = image ;
 	for ( int y = 0 ; y < image.height() ; y += gridH ) {
 		for ( int x = 0 ; x < image.width() ; x ++ ) {
@@ -54,7 +53,7 @@ void CEditData::updateImage()
 		painter.end() ;
 	}
 	m_pImageLabel->setPixmap(pix) ;
-	m_pImageLabel->resize(m_Image.size());
+	m_pImageLabel->resize(image.size());
 #endif
 }
 
@@ -72,89 +71,29 @@ bool CEditData::posToGrid(QPoint &ret, const QPoint &pos, const QSize &gridSize)
 	return true ;
 }
 
-bool CEditData::indexToGrid(QPoint &ret, int index, const QSize &gridSize)
+QStandardItem *CEditData::addMap(QString id)
 {
-	int w = m_Image.width() / gridSize.width() ;
-	int h = m_Image.height() / gridSize.height() ;
-	if ( index < 0 || index >= w*h ) { return false ; }
+	QStandardItem *item = new QStandardItem(id) ;
+	QStandardItem *root = m_model.invisibleRootItem() ;
+	root->appendRow(item) ;
 
-	ret.setX(index % w) ;
-	ret.setY(index / w) ;
-	return true ;
+	MapDataGroup data ;
+	data.first = item ;
+	MapData &map = data.second ;
+	map.mapGridSize = g_Setting->getMapGridSize() ;
+	map.imgGridSize = g_Setting->getImageGridSize() ;
+	m_mapDataGroupList.append(data) ;
+
+	return item ;
 }
-
-int CEditData::gridToIndex(const QPoint grid, const QSize &gridSize)
+void CEditData::delMap(QStandardItem *item)
 {
-	int w = m_Image.width() / gridSize.width() ;
-	int h = m_Image.height() / gridSize.height() ;
-	if ( grid.x() < 0 || grid.x() >= w ) { return -1 ; }
-	if ( grid.y() < 0 || grid.y() >= h ) { return -1 ; }
-
-	return grid.y() * w + grid.x() ;
-}
-
-#if 0
-void CEditData::addGridData(QPoint mapGrid, QPoint imgGrid, int data)
-{
-	removeGridData(mapGrid) ;
-
-	GridData d ;
-	d.mapGrid = mapGrid ;
-	d.imageGrid = imgGrid ;
-	d.data = data ;
-	m_gridData.push_back(d) ;
-}
-
-int CEditData::getGridDataIndex(QPoint mapGrid)
-{
-	for ( int i = 0 ; i < m_gridData.size() ; i ++ ) {
-		if ( m_gridData[i].mapGrid == mapGrid ) { return i ; }
+	int index = getMapDataIndex(item) ;
+	if ( index >= 0 ) {
+		delMapData(index) ;
 	}
-	return -1 ;
+
+	QStandardItem *root = m_model.invisibleRootItem() ;
+	root->removeRow(item->index().row());
 }
 
-CEditData::GridData &CEditData::getGridData(int index)
-{
-	return m_gridData[index] ;
-}
-
-void CEditData::removeGridData(QPoint mapGrid)
-{
-	int idx = getGridDataIndex(mapGrid) ;
-	if ( idx >= 0 ) {
-		m_gridData.takeAt(idx) ;
-	}
-}
-
-void CEditData::addImageData(QPoint imgGrid, bool bUnit, bool bThrough)
-{
-	removeGridData(imgGrid) ;
-
-	ImageData d ;
-	d.grid = imgGrid ;
-	d.bUnitable = bUnit ;
-	d.bThrough = bThrough ;
-	m_imgData.push_back(d) ;
-}
-
-int CEditData::getImageDataIndex(QPoint imgGrid)
-{
-	for ( int i = 0 ; i < m_imgData.size() ; i ++ ) {
-		if ( m_imgData[i].grid == imgGrid ) { return i ; }
-	}
-	return -1 ;
-}
-
-CEditData::ImageData &CEditData::getImageData(int index)
-{
-	return m_imgData[index] ;
-}
-
-void CEditData::removeImageData(QPoint imgGrid)
-{
-	int idx = getImageDataIndex(imgGrid) ;
-	if ( idx >= 0 ) {
-		m_imgData.takeAt(idx) ;
-	}
-}
-#endif

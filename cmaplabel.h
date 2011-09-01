@@ -4,7 +4,7 @@
 #include <QLabel>
 #include "cgridlabel.h"
 
-typedef QPair<QPoint, QLabel *>	GridLabel ;
+typedef QPair<QPoint, QLabel *>	TipLabel ;
 
 class CMapLabel : public QLabel
 {
@@ -43,14 +43,19 @@ private:
 	int getGridLabelIndex(QPoint grid) ;
 
 	void addMapGrid(const QPoint basePos) ;
+	void addMapGrid(const QPoint mapGrid, const QPoint imgGrid) ;
+
 	void removeMapGrid(const QPoint basePos) ;
 	void makeDropLabel(QPoint pos, QPoint gridSt, QPoint gridEnd) ;
+
+	bool posToGrid(QPoint &ret, const QPoint pos) ;
+	bool gridToPos(QPoint &ret, const QPoint grid) ;
 
 private:
 	bool				m_bPressCtrl ;
 	int					m_nMapControllType ;
 	bool				m_bMousePressLeft, m_bMousePressRight ;
-	QList<GridLabel>	m_GridLabel ;
+	QList<TipLabel>		m_TipLabel ;
 	QLabel				*m_pMapLabel ;
 	QLabel				*m_pDropLabel ;
 	CGridLabel			*m_pGridLabel ;

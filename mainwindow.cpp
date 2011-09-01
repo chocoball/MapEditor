@@ -15,6 +15,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
+	ui->treeView->setModel(&g_EditData->getModel()) ;
+	ui->treeView->setHeaderHidden(true) ;
+
 	setWindowTitle(kExecName);
 
 	QLabel *pLabelImage = new CImageLabel(this) ;
@@ -26,52 +29,46 @@ MainWindow::MainWindow(QWidget *parent) :
 	pLabelMap->show();
 	ui->scrollArea_Map->setWidget(pLabelMap) ;
 	g_EditData->setMapLabel(pLabelMap) ;
-	g_EditData->updateMap();
-
-	m_pSplitterImage = new QSplitter(ui->centralWidget) ;
-	m_pSplitterImage->addWidget(ui->frame_image) ;
-	m_pSplitterImage->addWidget(ui->groupBox_setting);
-	m_pSplitterImage->setOrientation(Qt::Vertical);
-	m_pSplitterImage->setGeometry(0,
-								  0,
-								  ui->frame_image->width(),
-								  ui->groupBox_setting->y()+ui->groupBox_setting->height());
 
 	m_pSplitterMap = new QSplitter(ui->centralWidget) ;
 	m_pSplitterMap->addWidget(ui->frame_tree);
 	m_pSplitterMap->addWidget(ui->frame_map);
-	m_pSplitterMap->addWidget(m_pSplitterImage) ;
+	m_pSplitterMap->addWidget(ui->frame_image) ;
 	m_pSplitterMap->setGeometry(0,
 								0,
-								m_pSplitterImage->width()+ui->frame_map->width()+ui->frame_tree->width(),
+								ui->frame_image->width()+ui->frame_map->width()+ui->frame_tree->width(),
 								ui->frame_map->height());
 
 	setSpaceSize() ;
 	restoreSettings() ;
 
+	m_pActAddMap		= new QAction("Map", this) ;
+	m_pActAddTreasure	= new QAction(trUtf8("お宝"), this) ;
+
 	ui->action_Open->setShortcut(QKeySequence::Open);
 	ui->action_Save->setShortcut(QKeySequence::Save);
 	ui->action_SaveAs->setShortcut(QKeySequence::SaveAs);
-	connect(ui->action_Open,	SIGNAL(triggered()), this, SLOT(slot_fileOpen())) ;
-	connect(ui->action_Save,	SIGNAL(triggered()), this, SLOT(slot_fileSave())) ;
-	connect(ui->action_SaveAs,	SIGNAL(triggered()), this, SLOT(slot_fileSaveAs())) ;
 
-	connect(ui->spinBox_grid_w_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridW(int))) ;
-	connect(ui->spinBox_grid_h_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridH(int))) ;
-	connect(ui->spinBox_grid_w_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridW(int))) ;
-	connect(ui->spinBox_grid_h_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridH(int))) ;
-
-	connect(ui->checkBox_unit, SIGNAL(clicked(bool)), this, SLOT(slot_clickCheckBoxUnit(bool))) ;
-	connect(ui->checkBox_through, SIGNAL(clicked(bool)), this, SLOT(slot_clickCheckBoxThrough(bool))) ;
-
-	connect(m_pSplitterImage, SIGNAL(splitterMoved(int,int)), this, SLOT(slot_splitterMoveImage(int, int))) ;
-	connect(m_pSplitterMap, SIGNAL(splitterMoved(int,int)), this, SLOT(slot_splitterMoveMap(int, int))) ;
-
-	connect(pLabelImage, SIGNAL(sig_changeSelectGridRect()), pLabelMap, SLOT(slot_changeSelectGridRect())) ;
-	connect(pLabelImage, SIGNAL(sig_changeSelectGridRect()), this, SLOT(slot_changeSelectGridRect())) ;
-
-	connect(this, SIGNAL(sig_keyPress(QKeyEvent*)), pLabelMap, SLOT(slot_keyPress(QKeyEvent*))) ;
-	connect(this, SIGNAL(sig_keyRelease(QKeyEvent*)), pLabelMap, SLOT(slot_keyRelease(QKeyEvent*))) ;
+	connect(ui->action_Open,		SIGNAL(triggered()),				this,		SLOT(slot_fileOpen())) ;
+	connect(ui->action_Save,		SIGNAL(triggered()),				this,		SLOT(slot_fileSave())) ;
+	connect(ui->action_SaveAs,		SIGNAL(triggered()),				this,		SLOT(slot_fileSaveAs())) ;
+	connect(ui->spinBox_grid_w_img, SIGNAL(valueChanged(int)),			this,		SLOT(slot_changeImageGridW(int))) ;
+	connect(ui->spinBox_grid_h_img, SIGNAL(valueChanged(int)),			this,		SLOT(slot_changeImageGridH(int))) ;
+	connect(ui->spinBox_grid_w_map, SIGNAL(valueChanged(int)),			this,		SLOT(slot_changeMapGridW(int))) ;
+	connect(ui->spinBox_grid_h_map, SIGNAL(valueChanged(int)),			this,		SLOT(slot_changeMapGridH(int))) ;
+	connect(ui->checkBox_unit,		SIGNAL(clicked(bool)),				this,		SLOT(slot_clickCheckBoxUnit(bool))) ;
+	connect(ui->checkBox_through,	SIGNAL(clicked(bool)),				this,		SLOT(slot_clickCheckBoxThrough(bool))) ;
+	connect(m_pSplitterMap,			SIGNAL(splitterMoved(int,int)),		this,		SLOT(slot_splitterMoveMap(int, int))) ;
+	connect(pLabelImage,			SIGNAL(sig_changeSelectGridRect()),	pLabelMap,	SLOT(slot_changeSelectGridRect())) ;
+	connect(pLabelImage,			SIGNAL(sig_changeSelectGridRect()),	this,		SLOT(slot_changeSelectGridRect())) ;
+	connect(this,					SIGNAL(sig_keyPress(QKeyEvent*)),	pLabelMap,	SLOT(slot_keyPress(QKeyEvent*))) ;
+	connect(this,					SIGNAL(sig_keyRelease(QKeyEvent*)),	pLabelMap,	SLOT(slot_keyRelease(QKeyEvent*))) ;
+	connect(ui->pushButton_add,		SIGNAL(clicked()),					this,		SLOT(slot_clickPushAdd())) ;
+	connect(ui->pushButton_del,		SIGNAL(clicked()),					this,		SLOT(slot_clickPushDel())) ;
+	connect(ui->treeView,			SIGNAL(clicked(QModelIndex)),		this,		SLOT(slot_treeViewClicked(QModelIndex))) ;
+	connect(m_pActAddMap,			SIGNAL(triggered()),				this,		SLOT(slot_addMap())) ;
+	connect(m_pActAddTreasure,		SIGNAL(triggered()),				this,		SLOT(slot_addTreasure())) ;
+	connect(&g_EditData->getModel(),SIGNAL(itemChanged(QStandardItem*)),this,		SLOT(slot_changeTreeItem(QStandardItem*))) ;
 }
 
 MainWindow::~MainWindow()
@@ -81,6 +78,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *)
 {
+	QSize size ;
+	size.setWidth(ui->spinBox_grid_w_img->value()) ;
+	size.setHeight(ui->spinBox_grid_h_img->value()) ;
+	g_Setting->setImageGridSize(size) ;
+
+	size.setWidth(ui->spinBox_grid_w_map->value()) ;
+	size.setHeight(ui->spinBox_grid_h_map->value()) ;
+	g_Setting->setMapGridSize(size) ;
+
 	g_Setting->setMainWindowGeometry(saveGeometry()) ;
 	g_Setting->setMainWindowState(saveState(kVersion)) ;
 	g_Setting->writeSetting();
@@ -148,6 +154,9 @@ void MainWindow::slot_splitterMoveImage(int, int)
 	QSize size ;
 	size = ui->frame_image->size() - QSize(ui->scrollArea_Image->x(), ui->scrollArea_Image->y()) - m_frameImageSpace ;
 	ui->scrollArea_Image->resize(size) ;
+
+	int space = 340 - (70+261) ;
+	ui->groupBox_setting->move(ui->groupBox_setting->x(), ui->scrollArea_Image->y()+size.height()+space);
 }
 
 // Map frame 幅変更
@@ -169,44 +178,44 @@ void MainWindow::slot_splitterMoveMap(int, int)
 // image grid w 変更
 void MainWindow::slot_changeImageGridW(int val)
 {
-	QSize size = g_Setting->getImageGridSize() ;
-	if ( size.width() == val ) { return ; }
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+	if ( p->imgGridSize.width() == val ) { return ; }
 
-	size.setWidth(val) ;
-	g_Setting->setImageGridSize(size) ;
+	p->imgGridSize.setWidth(val) ;
 	g_EditData->updateImage();
 }
 
 // image grid h 変更
 void MainWindow::slot_changeImageGridH(int val)
 {
-	QSize size = g_Setting->getImageGridSize() ;
-	if ( size.height() == val ) { return ; }
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+	if ( p->imgGridSize.height() == val ) { return ; }
 
-	size.setHeight(val) ;
-	g_Setting->setImageGridSize(size) ;
+	p->imgGridSize.setHeight(val) ;
 	g_EditData->updateImage();
 }
 
 // map grid w 変更
 void MainWindow::slot_changeMapGridW(int val)
 {
-	QSize size = g_Setting->getMapGridSize() ;
-	if ( size.width() == val ) { return ; }
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+	if ( p->mapGridSize.width() == val ) { return ; }
 
-	size.setWidth(val) ;
-	g_Setting->setMapGridSize(size) ;
+	p->mapGridSize.setWidth(val) ;
 	g_EditData->updateMap();
 }
 
 // map grid h 変更
 void MainWindow::slot_changeMapGridH(int val)
 {
-	QSize size = g_Setting->getMapGridSize() ;
-	if ( size.height() == val ) { return ; }
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+	if ( p->mapGridSize.height() == val ) { return ; }
 
-	size.setHeight(val) ;
-	g_Setting->setMapGridSize(size) ;
+	p->mapGridSize.setHeight(val) ;
 	g_EditData->updateMap();
 }
 
@@ -215,65 +224,68 @@ void MainWindow::slot_clickCheckBoxUnit(bool val)
 {
 	qDebug() << "slot_clickCheckBoxUnit" << val ;
 
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
 	ui->checkBox_unit->setCheckState(val ? Qt::Checked : Qt::Unchecked) ;
 
-#if 0	// TODO
 	QPoint st = g_EditData->getSelStartGrid() ;
 	QPoint end = g_EditData->getSelEndGrid() ;
 	for ( int y = st.y() ; y <= end.y() ; y ++ ) {
 		for ( int x = st.x() ; x <= end.x() ; x ++ ) {
 			QPoint grid = QPoint(x, y) ;
-			int index = g_EditData->getImageDataIndex(grid);
+			int index = p->getImageDataIndex(grid) ;
 			if ( index >= 0 ) {
-				CEditData::ImageData &data = g_EditData->getImageData(index) ;
+				CEditData::ImageData &data = p->getImageData(index) ;
 				data.bUnitable = val ;
 			}
 			else {
-				g_EditData->addImageData(grid, val, false) ;
+				p->addImageData(grid, val, false) ;
 			}
 		}
 	}
-#endif
 }
 
 // 敵通過 チェックボックス変更
 void MainWindow::slot_clickCheckBoxThrough(bool val)
 {
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
 	ui->checkBox_through->setCheckState(val ? Qt::Checked : Qt::Unchecked) ;
 
-#if 0	// TODO
 	QPoint st = g_EditData->getSelStartGrid() ;
 	QPoint end = g_EditData->getSelEndGrid() ;
 	for ( int y = st.y() ; y <= end.y() ; y ++ ) {
 		for ( int x = st.x() ; x <= end.x() ; x ++ ) {
 			QPoint grid = QPoint(x, y) ;
-			int index = g_EditData->getImageDataIndex(grid);
+			int index = p->getImageDataIndex(grid);
 			if ( index >= 0 ) {
-				CEditData::ImageData &data = g_EditData->getImageData(index) ;
+				CEditData::ImageData &data = p->getImageData(index) ;
 				data.bThrough = val ;
 			}
 			else {
-				g_EditData->addImageData(grid, false, val) ;
+				p->addImageData(grid, false, val) ;
 			}
 		}
 	}
-#endif
 }
 
 // image label 選択グリッド変更
 void MainWindow::slot_changeSelectGridRect()
 {
-#if 0	// TODO
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+
 	bool bUnit = false, bThrough = false ;
 	QPoint st = g_EditData->getSelStartGrid() ;
 	QPoint end = g_EditData->getSelEndGrid() ;
 	for ( int y = st.y() ; y <= end.y() ; y ++ ) {
 		for ( int x = st.x() ; x <= end.x() ; x ++ ) {
 			QPoint grid = QPoint(x, y) ;
-			int index = g_EditData->getImageDataIndex(grid);
+			int index = p->getImageDataIndex(grid) ;
 			if ( index < 0 ) { continue ; }
-
-			CEditData::ImageData &data = g_EditData->getImageData(index) ;
+			CEditData::ImageData &data = p->getImageData(index) ;
 			if ( data.bUnitable ) { bUnit = data.bUnitable ; }
 			if ( data.bThrough ) { bThrough = data.bThrough ; }
 		}
@@ -297,7 +309,114 @@ void MainWindow::slot_changeSelectGridRect()
 		ui->checkBox_unit->setChecked(bUnit) ;
 		ui->checkBox_through->setChecked(bThrough);
 	}
-#endif
+}
+
+// 追加 押下
+void MainWindow::slot_clickPushAdd()
+{
+	QMenu menu(this) ;
+	QList<QAction *> list ;
+	list << m_pActAddMap << m_pActAddTreasure ;
+	menu.exec(list, this->cursor().pos()) ;
+}
+
+// 削除 押下
+void MainWindow::slot_clickPushDel()
+{
+	if ( !g_EditData->isSelectMap() ) { return ; }
+
+	QModelIndex index = g_EditData->getSelModelIndex() ;
+	QStandardItem *pItem = g_EditData->getModel().itemFromIndex(index) ;
+	if ( !pItem ) { return ; }
+
+	if ( index.internalPointer() == g_EditData->getModel().invisibleRootItem() ) {
+		g_EditData->delMap(pItem) ;
+	}
+	else {
+		CEditData::MapData *p = g_EditData->getSelectMapData() ;
+		if ( !p ) { return ; }
+		p->removeTreasureData(pItem) ;
+		QStandardItem *pMapItem = g_EditData->getSelectMapItem() ;
+		if ( pMapItem ) {
+			pMapItem->removeRow(index.row());
+		}
+	}
+}
+
+// treeView クリック
+void MainWindow::slot_treeViewClicked(QModelIndex index)
+{
+	qDebug() << "slot_treeViewClicked" ;
+
+	QModelIndex old = g_EditData->getSelModelIndex() ;
+	g_EditData->setSelModelIndex(index) ;
+
+	if ( old != index ) {
+		CEditData::MapData *p = g_EditData->getSelectMapData() ;
+		if ( p ) {
+			ui->spinBox_grid_w_img->setValue(p->imgGridSize.width());
+			ui->spinBox_grid_h_img->setValue(p->imgGridSize.height());
+			ui->spinBox_grid_w_map->setValue(p->mapGridSize.width());
+			ui->spinBox_grid_h_map->setValue(p->mapGridSize.height());
+
+			g_EditData->update() ;
+		}
+	}
+}
+
+// マップ追加
+void MainWindow::slot_addMap()
+{
+	bool bOk = false ;
+	QString str = QInputDialog::getText(this,
+										trUtf8("New Map"),
+										trUtf8("マップ名を入力してください"),
+										QLineEdit::Normal,
+										trUtf8("0x00000000"),
+										&bOk) ;
+	if ( !bOk )				{ return ; }
+	if ( str.isEmpty() )	{ return ; }
+
+	g_EditData->addMap(str) ;
+}
+
+// お宝追加
+void MainWindow::slot_addTreasure()
+{
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) {
+		QMessageBox::warning(this, trUtf8("エラー"), trUtf8("マップが選択されていません") ) ;
+		return ;
+	}
+
+	bool bOk = false ;
+	int num = QInputDialog::getInt(this, trUtf8("個数を入力してください"), trUtf8("個数"), 1, 1, 1024, 1, &bOk) ;
+	if ( !bOk ) { return ; }
+
+	QModelIndex modelIndex = g_EditData->getSelModelIndex() ;
+	while ( modelIndex.internalPointer() != g_EditData->getModel().invisibleRootItem() ) { modelIndex = modelIndex.parent() ; }
+	QStandardItem *pRoot = g_EditData->getModel().itemFromIndex(modelIndex) ;
+	if ( !pRoot ) { return ; }
+
+	QStandardItem *pNew = new QStandardItem(trUtf8("%0").arg(num)) ;
+	pRoot->appendRow(pNew) ;
+	p->addTreasureData(QPoint(), num, pNew) ;
+
+	ui->treeView->setCurrentIndex(pNew->index());
+}
+
+// ツリービューアイテム 変更
+void MainWindow::slot_changeTreeItem(QStandardItem *item)
+{
+	qDebug() << "slot_changeTreeItem" ;
+	if ( item->index().internalPointer() == g_EditData->getModel().invisibleRootItem() ) { return ; }
+
+	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	if ( !p ) { return ; }
+	int index = p->getTreasureDataIndex(item) ;
+	if ( index < 0 ) { return ; }
+	CEditData::TreasureData &data = p->getTreasureData(index) ;
+	data.num = item->text().toInt() ;
 }
 
 // ファイルを開く
@@ -318,7 +437,26 @@ void MainWindow::fileOpen(QString &fileName)
 			return ;
 		}
 		qDebug() << "orig size:" << image.size() ;
-		g_EditData->setImage(image) ;
+
+		CEditData::MapData *p = g_EditData->getSelectMapData() ;
+		if ( !p ) {
+			QStandardItem *id = g_EditData->addMap("0x00000000") ;
+			int index = g_EditData->getMapDataIndex(id) ;
+			if ( index < 0 ) {
+				QMessageBox::warning(this, trUtf8("エラー"), trUtf8("未知の不具合")) ;
+
+				return ;
+			}
+			CEditData::MapData &data = g_EditData->getMapData(index) ;
+			data.image = image ;
+
+			ui->treeView->setCurrentIndex(id->index()) ;
+		}
+		else {
+			p->image = image ;
+			g_EditData->update() ;
+		}
+
 		g_EditData->update() ;
 		m_strSaveFileName = QString() ;
 	}
@@ -346,14 +484,12 @@ void MainWindow::restoreSettings()
 
 	restoreState(g_Setting->getMainWindowState()) ;
 	restoreGeometry(g_Setting->getMainWindowGeometry()) ;
-
-//	slot_splitterMoveMap(0, 0);
 }
 
 void MainWindow::setSpaceSize()
 {
-	m_frameImageSpace = QSize(10, 10) ;
+	m_frameImageSpace = QSize(10, 451-70-281) ;
 	m_frameMapSpace = QSize(10, 10) ;
 	m_frameTreeSpace = QSize(10, 60) ;
-	m_windowSpace = QSize(10, 36) ;
+	m_windowSpace = QSize(10, 26) ;
 }
