@@ -30,13 +30,16 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->scrollArea_Map->setWidget(pLabelMap) ;
 	g_EditData->setMapLabel(pLabelMap) ;
 
+	QTabWidget *tabWidget = new QTabWidget(this) ;
+	tabWidget->addTab(ui->frame_image, trUtf8("マップ")) ;
+
 	m_pSplitterMap = new QSplitter(ui->centralWidget) ;
 	m_pSplitterMap->addWidget(ui->frame_tree);
 	m_pSplitterMap->addWidget(ui->frame_map);
-	m_pSplitterMap->addWidget(ui->frame_image) ;
+	m_pSplitterMap->addWidget(tabWidget) ;
 	m_pSplitterMap->setGeometry(0,
 								0,
-								ui->frame_image->width()+ui->frame_map->width()+ui->frame_tree->width(),
+								tabWidget->width()+ui->frame_map->width()+ui->frame_tree->width(),
 								ui->frame_map->height());
 
 	setSpaceSize() ;
