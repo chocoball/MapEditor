@@ -25,7 +25,7 @@ void CEditData::updateImage()
 	if ( !m_pImageLabel ) { return ; }
 	MapData *p = getSelectMapData() ;
 	if ( !p ) { return ; }
-	if ( p->image.isNull() ) { return ; }
+//	if ( p->image.isNull() ) { return ; }
 
 	QSize gridSize = p->imgGridSize ;
 

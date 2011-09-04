@@ -75,8 +75,8 @@ private:
 	QSize			m_windowSpace ;
 	QSize			m_frameTreeSpace ;
 
-	QAction			*m_pActAddMap ;
-	QAction			*m_pActAddTreasure ;
+//	QAction			*m_pActAddMap ;
+//	QAction			*m_pActAddTreasure ;
 };
 
 #endif // MAINWINDOW_H

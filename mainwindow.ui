@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>840</width>
-    <height>477</height>
+    <width>1211</width>
+    <height>526</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -208,8 +208,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>367</width>
-        <height>357</height>
+        <width>369</width>
+        <height>359</height>
        </rect>
       </property>
      </widget>
@@ -345,14 +345,30 @@
      </property>
     </widget>
    </widget>
+   <widget class="QFrame" name="frame_data">
+    <property name="geometry">
+     <rect>
+      <x>840</x>
+      <y>10</y>
+      <width>291</width>
+      <height>441</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>840</width>
-     <height>17</height>
+     <width>1211</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

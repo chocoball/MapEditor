@@ -22,7 +22,6 @@ void CMapLabel::updateLabels()
 	if ( !g_EditData->isSelectMap() ) { return ; }
 	CEditData::MapData *p = g_EditData->getSelectMapData() ;
 	if ( !p ) { return ; }
-	if ( p->image.isNull() ) { return ; }
 
 	qDebug() << "CMapLabel::updateLabels" ;
 
@@ -39,6 +38,8 @@ void CMapLabel::updateLabels()
 		delete m_TipLabel[i].second ;
 	}
 	m_TipLabel.clear() ;
+
+	if ( p->image.isNull() ) { return ; }
 
 	for ( int i = 0 ; i < p->gridDatas.size() ; i ++ ) {
 		CEditData::GridData &data = p->gridDatas[i] ;

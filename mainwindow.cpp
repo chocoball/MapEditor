@@ -45,8 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	setSpaceSize() ;
 	restoreSettings() ;
 
-	m_pActAddMap		= new QAction("Map", this) ;
-	m_pActAddTreasure	= new QAction(trUtf8("お宝"), this) ;
+//	m_pActAddMap		= new QAction("Map", this) ;
+//	m_pActAddTreasure	= new QAction(trUtf8("お宝"), this) ;
 
 	ui->action_Open->setShortcut(QKeySequence::Open);
 	ui->action_Save->setShortcut(QKeySequence::Save);
@@ -69,8 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->pushButton_add,		SIGNAL(clicked()),					this,		SLOT(slot_clickPushAdd())) ;
 	connect(ui->pushButton_del,		SIGNAL(clicked()),					this,		SLOT(slot_clickPushDel())) ;
 	connect(ui->treeView,			SIGNAL(clicked(QModelIndex)),		this,		SLOT(slot_treeViewClicked(QModelIndex))) ;
-	connect(m_pActAddMap,			SIGNAL(triggered()),				this,		SLOT(slot_addMap())) ;
-	connect(m_pActAddTreasure,		SIGNAL(triggered()),				this,		SLOT(slot_addTreasure())) ;
+//	connect(m_pActAddMap,			SIGNAL(triggered()),				this,		SLOT(slot_addMap())) ;
+//	connect(m_pActAddTreasure,		SIGNAL(triggered()),				this,		SLOT(slot_addTreasure())) ;
 	connect(&g_EditData->getModel(),SIGNAL(itemChanged(QStandardItem*)),this,		SLOT(slot_changeTreeItem(QStandardItem*))) ;
 }
 
@@ -317,10 +317,13 @@ void MainWindow::slot_changeSelectGridRect()
 // 追加 押下
 void MainWindow::slot_clickPushAdd()
 {
+	slot_addMap() ;
+/*
 	QMenu menu(this) ;
 	QList<QAction *> list ;
 	list << m_pActAddMap << m_pActAddTreasure ;
 	menu.exec(list, this->cursor().pos()) ;
+*/
 }
 
 // 削除 押下
