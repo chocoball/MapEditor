@@ -9,7 +9,7 @@ CScrollAreaImage::CScrollAreaImage(QWidget *parent) :
 
 void CScrollAreaImage::dragEnterEvent(QDragEnterEvent *event)
 {
-	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	if ( !p ) {
 		event->ignore();
 		return ;
@@ -19,7 +19,7 @@ void CScrollAreaImage::dragEnterEvent(QDragEnterEvent *event)
 
 void CScrollAreaImage::dropEvent(QDropEvent *event)
 {
-	CEditData::MapData *p = g_EditData->getSelectMapData() ;
+	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	if ( !p ) {
 		event->ignore();
 		return ;

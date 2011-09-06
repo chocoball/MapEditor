@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1211</width>
-    <height>526</height>
+    <width>1139</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -208,8 +208,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>369</width>
-        <height>359</height>
+        <width>367</width>
+        <height>357</height>
        </rect>
       </property>
      </widget>
@@ -334,7 +334,7 @@
       <string>削除</string>
      </property>
     </widget>
-    <widget class="QTreeView" name="treeView">
+    <widget class="QListView" name="listView_map">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -360,6 +360,104 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>50</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>お宝</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_point">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>230</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>開始、終了位置</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_treasure_add">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>10</y>
+       <width>51</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>追加</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_treasure_del">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>10</y>
+       <width>51</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>削除</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_pos_add">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>230</y>
+       <width>51</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>追加</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_pos_del">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>230</y>
+       <width>51</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>削除</string>
+     </property>
+    </widget>
+    <widget class="QListView" name="listView_treasure">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>41</y>
+       <width>271</width>
+       <height>171</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QListView" name="listView_point">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>260</y>
+       <width>271</width>
+       <height>171</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -367,8 +465,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1211</width>
-     <height>22</height>
+     <width>1139</width>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -15,7 +15,7 @@ public:
 		kMapControll_Add,
 		kMapControll_Remove,
 		kMapControll_AddMulti,
-		kMapControll_RemoveMulti,
+		kMapControll_RemoveMulti
 	} ;
 
 public:
@@ -26,12 +26,20 @@ signals:
 
 public slots:
 	void slot_changeSelectGridRect() ;
+
+	void slot_addTreasureLabel(int index) ;
+	void slot_removeTreasureLabel(int index) ;
+
+	void slot_addPointLabel(int index) ;
+	void slot_removePointLabel(int index) ;
+
 	void slot_mousePress(QMouseEvent *event) ;
 	void slot_mouseMove(QMouseEvent *event) ;
 	void slot_mouseRelease(QMouseEvent *event) ;
 
 	void slot_keyPress(QKeyEvent*) ;
 	void slot_keyRelease(QKeyEvent*) ;
+
 protected:
 
 private:
@@ -48,15 +56,20 @@ private:
 	void removeMapGrid(const QPoint basePos) ;
 	void makeDropLabel(QPoint pos, QPoint gridSt, QPoint gridEnd) ;
 
-	bool posToGrid(QPoint &ret, const QPoint pos) ;
-	bool gridToPos(QPoint &ret, const QPoint grid) ;
+	void releaseTipLabel(QList<TipLabel> &label, int index = -1) ;
+
+	QLabel *makeLabel(QPoint grid, QSize size, QColor col) ;
 
 private:
 	bool				m_bPressCtrl ;
 	int					m_nMapControllType ;
 	bool				m_bMousePressLeft, m_bMousePressRight ;
 	QList<TipLabel>		m_TipLabel ;
-	QLabel				*m_pMapLabel ;
+	QList<TipLabel>		m_TreasureLabel ;
+	QList<TipLabel>		m_PointLabel ;
+
+	QLabel				*m_pLayerMap ;
+	QLabel				*m_pLayerMark ;
 	QLabel				*m_pDropLabel ;
 	CGridLabel			*m_pGridLabel ;
 	QSize				m_oldDropSize ;

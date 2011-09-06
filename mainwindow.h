@@ -39,12 +39,21 @@ public slots:
 	void slot_clickPushAdd() ;
 	void slot_clickPushDel() ;
 
-	void slot_treeViewClicked(QModelIndex index) ;
+	void slot_clickedListViewMap(QModelIndex) ;
+	void slot_clickedListViewTreasure(QModelIndex) ;
+	void slot_clickedListViewPoint(QModelIndex) ;
 
-	void slot_addMap() ;
-	void slot_addTreasure() ;
+	void slot_tabChanged(int index) ;
 
-	void slot_changeTreeItem(QStandardItem*) ;
+	void slot_pushAddTreasure() ;
+	void slot_pushDelTreasure() ;
+
+	void slot_pushAddPoint() ;
+	void slot_pushDelPoint() ;
+
+	void slot_clickAddStartPoint() ;
+	void slot_clickAddEndPoint() ;
+
 signals:
 	void sig_keyPress(QKeyEvent *) ;
 	void sig_keyRelease(QKeyEvent *) ;
@@ -75,8 +84,8 @@ private:
 	QSize			m_windowSpace ;
 	QSize			m_frameTreeSpace ;
 
-//	QAction			*m_pActAddMap ;
-//	QAction			*m_pActAddTreasure ;
+	QAction			*m_pActAddStartPoint ;
+	QAction			*m_pActAddEndPoint ;
 };
 
 #endif // MAINWINDOW_H
