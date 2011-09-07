@@ -38,6 +38,7 @@ public:
 	typedef struct _tagMapData {
 		QString				mapName ;
 		QImage				image ;
+		QString				imageName ;
 		QSize				imgGridSize, mapGridSize ;
 
 		QList<GridData>		gridDatas ;
@@ -111,6 +112,7 @@ public:
     Q_OBJECT
 public:
     explicit CListModelMap(QObject *parent = 0);
+	~CListModelMap() ;
 
 	QVariant data(const QModelIndex &index, int role) const ;
 	int rowCount(const QModelIndex &parent) const ;
@@ -123,6 +125,7 @@ public:
 	bool removeMap(int row) ;
 
 	MapData &getMap(int row) { return m_mapDatas[row] ; }
+	QList<MapData> &getList() { return m_mapDatas ; }
 
 signals:
 

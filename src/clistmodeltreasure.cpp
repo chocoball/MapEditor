@@ -70,19 +70,18 @@ bool CListModelTreasure::removeRows(int row, int count, const QModelIndex &paren
 	return true ;
 }
 
-int CListModelTreasure::addTreasure(QModelIndex mapIndex, QPoint mapGrid)
+int CListModelTreasure::addTreasure(QPoint mapGrid, int num)
 {
 	int row = rowCount(QModelIndex()) ;
 	insertRows(row, 1, QModelIndex()) ;
 	QModelIndex index = this->index(row) ;
 	if ( !index.isValid() ) { return -1 ; }
-	if ( !setData(index, 1, Qt::EditRole) ) {
+	if ( !setData(index, num, Qt::EditRole) ) {
 		return -1 ;
 	}
 	if ( !setData(index, mapGrid, Qt::UserRole) ) {
 		return -1 ;
 	}
-	m_datas[row].mapIndex = mapIndex ;
 	return row ;
 }
 

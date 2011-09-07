@@ -6,6 +6,14 @@ CListModelMap::CListModelMap(QObject *parent) :
 {
 }
 
+CListModelMap::~CListModelMap()
+{
+	for ( int i = 0 ; i < m_mapDatas.size() ; i ++ ) {
+		delete m_mapDatas[i].pModelTreasure ;
+		delete m_mapDatas[i].pModelPoint ;
+	}
+}
+
 QVariant CListModelMap::data(const QModelIndex &index, int role) const
 {
 	int row = index.row() ;

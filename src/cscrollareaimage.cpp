@@ -38,5 +38,6 @@ void CScrollAreaImage::dropEvent(QDropEvent *event)
 	}
 
 	p->image = image ;
+	p->imageName = fileName ;
 	g_EditData->update();
 }

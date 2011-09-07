@@ -8,7 +8,6 @@ class CListModelTreasure : public QAbstractListModel
 {
 public:
 	typedef struct _tagTreasureData {
-		QModelIndex mapIndex ;
 		QPoint		mapGrid ;
 		int			num ;
 
@@ -29,7 +28,7 @@ public:
 	bool insertRows(int row, int count, const QModelIndex &parent) ;
 	bool removeRows(int row, int count, const QModelIndex &parent) ;
 
-	int addTreasure(QModelIndex mapIndex, QPoint mapGrid) ;
+	int addTreasure(QPoint mapGrid, int num) ;
 	void removeTreasure(int row) ;
 
 	TreasureData &getTreasure(int row) { return m_datas[row] ; }

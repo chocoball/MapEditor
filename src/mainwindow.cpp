@@ -9,6 +9,7 @@
 #define kExecName		"MapEditor"
 #define kVersion		0x00000000
 #define kFileExt_JSON	".json"
+#define kFileExt_XML	".xml"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -137,7 +138,7 @@ void MainWindow::slot_fileOpen()
 											this,
 											tr("Open File"),
 											g_Setting->getFileOpenDir(),
-											tr("Image Files (*.png);;Text Files("kFileExt_JSON");;")) ;
+											tr("All Files (*.*);;Image (*.png);;JSON (*"kFileExt_JSON");;XML (*"kFileExt_XML");;")) ;
 	if ( fileName.isEmpty() ) {
 		return ;
 	}
@@ -162,7 +163,7 @@ void MainWindow::slot_fileSaveAs()
 	QString str = QFileDialog::getSaveFileName(this,
 											   trUtf8("名前を付けて保存"),
 											   g_Setting->getFileSaveDir(),
-											   tr("Text (*"kFileExt_JSON");;")) ;
+											   tr("XML (*"kFileExt_XML");;JSON (*"kFileExt_JSON");;")) ;
 	if ( str.isEmpty() ) { return ; }
 
 	fileWrite(str) ;
@@ -383,24 +384,23 @@ void MainWindow::slot_clickedListViewMap(QModelIndex index)
 	QModelIndex old = g_EditData->getSelMapIndex() ;
 	g_EditData->setSelMapIndex(index) ;
 
-	if ( old != index ) {
-		qDebug() << "change Map" ;
-		CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
-		if ( p ) {
+	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
+	if ( p ) {
+		if ( old != index ) {
 			ui->spinBox_grid_w_img->setValue(p->imgGridSize.width());
 			ui->spinBox_grid_h_img->setValue(p->imgGridSize.height());
 			ui->spinBox_grid_w_map->setValue(p->mapGridSize.width());
 			ui->spinBox_grid_h_map->setValue(p->mapGridSize.height());
 
 			g_EditData->update() ;
+		}
 
-			ui->listView_treasure->setModel(p->pModelTreasure) ;
-			ui->listView_point->setModel(p->pModelPoint) ;
-		}
-		else {
-			ui->listView_treasure->setModel(NULL) ;
-			ui->listView_point->setModel(NULL) ;
-		}
+		ui->listView_treasure->setModel(p->pModelTreasure) ;
+		ui->listView_point->setModel(p->pModelPoint) ;
+	}
+	else {
+		ui->listView_treasure->setModel(NULL) ;
+		ui->listView_point->setModel(NULL) ;
 	}
 }
 
@@ -430,7 +430,7 @@ void MainWindow::slot_pushAddTreasure()
 {
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	if ( !p ) { return ; }
-	int row = p->pModelTreasure->addTreasure(ui->listView_map->currentIndex(), QPoint()) ;
+	int row = p->pModelTreasure->addTreasure(QPoint(), 1) ;
 	if ( row >= 0 ) {
 		g_EditData->getMapLabel()->slot_addTreasureLabel(row) ;
 	}
@@ -496,7 +496,8 @@ void MainWindow::fileOpen(QString &fileName)
 	g_Setting->setFileOpenDir(fileName) ;
 
 	if ( fileName.toLower().indexOf(".png") <= 0
-	  && fileName.toLower().indexOf(kFileExt_JSON) <= 0 ) {
+	  && fileName.toLower().indexOf(kFileExt_JSON) <= 0
+	  && fileName.toLower().indexOf(kFileExt_XML) <= 0 ) {
 		QMessageBox::warning(this, tr("warning"), trUtf8("対応していないファイルです") ) ;
 		return ;
 	}
@@ -518,6 +519,7 @@ void MainWindow::fileOpen(QString &fileName)
 			}
 			CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(index) ;
 			data.image = image ;
+			data.imageName = fileName ;
 			data.imgGridSize = QSize(ui->spinBox_grid_w_img->value(), ui->spinBox_grid_h_img->value()) ;
 			data.mapGridSize = QSize(ui->spinBox_grid_w_map->value(), ui->spinBox_grid_h_map->value()) ;
 
@@ -536,6 +538,26 @@ void MainWindow::fileOpen(QString &fileName)
 		m_strSaveFileName = fileName ;
 		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
 	}
+	else if ( fileName.toLower().indexOf(kFileExt_XML) > 0 ) {	// XMLファイル
+		g_EditData->release() ;
+		g_EditData->setModelMap(new CListModelMap(this)) ;
+		ui->listView_map->setModel(g_EditData->getModelMap()) ;
+
+		CSaveFileXml data ;
+		if ( !data.read(fileName) ) {
+			g_EditData->release() ;
+			g_EditData->setModelMap(new CListModelMap(this)) ;
+			ui->listView_map->setModel(g_EditData->getModelMap()) ;
+
+			QMessageBox::warning(this, trUtf8("エラー"), trUtf8("読み込みに失敗しました:%1").arg(fileName)) ;
+			return ;
+		}
+
+		g_EditData->update();
+
+		m_strSaveFileName = fileName ;
+		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
+	}
 }
 
 // ファイル保存
@@ -543,6 +565,18 @@ void MainWindow::fileWrite(QString &fileName)
 {
 	if ( fileName.indexOf(kFileExt_JSON) > 0 ) {
 		g_Setting->setFileSaveDir(fileName) ;
+		m_strSaveFileName = fileName ;
+		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
+	}
+	else if ( fileName.indexOf(kFileExt_XML) > 0 ) {
+		g_Setting->setFileSaveDir(fileName) ;
+
+		CSaveFileXml data ;
+		if ( !data.write(fileName) ) {
+			QMessageBox::warning(this, trUtf8("エラー"), trUtf8("保存失敗")) ;
+		}
+		m_strSaveFileName = fileName ;
+		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
 	}
 }
 
