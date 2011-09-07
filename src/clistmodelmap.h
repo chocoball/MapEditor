@@ -6,6 +6,7 @@
 #include "clistmodeltreasure.h"
 #include "clistmodelpoint.h"
 
+
 class CListModelMap : public QAbstractListModel
 {
 public:
@@ -122,10 +123,12 @@ public:
 	bool removeRows(int row, int count, const QModelIndex &parent) ;
 
 	int addMap(QString str) ;
+	int addMap(MapData &data, QList<CListModelTreasure::TreasureData> *pTreasureDatas, QList<CListModelPoint::PointData> *pPointDatas) ;
 	bool removeMap(int row) ;
 
 	MapData &getMap(int row) { return m_mapDatas[row] ; }
 	QList<MapData> &getList() { return m_mapDatas ; }
+
 
 signals:
 

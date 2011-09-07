@@ -471,13 +471,19 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="action_Open"/>
     <addaction name="action_Save"/>
     <addaction name="action_SaveAs"/>
    </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menu_Edit"/>
   </widget>
   <action name="action_Open">
    <property name="text">
@@ -494,13 +500,23 @@
     <string>名前を付けて保存</string>
    </property>
   </action>
+  <action name="action_Undo">
+   <property name="text">
+    <string>元に戻す</string>
+   </property>
+  </action>
+  <action name="action_Redo">
+   <property name="text">
+    <string>やり直す</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>CScrollAreaImage</class>
    <extends>QScrollArea</extends>
-   <header location="global">cscrollareaimage.h</header>
+   <header location="global">src/cscrollareaimage.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

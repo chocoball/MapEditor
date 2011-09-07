@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "cmaplabel.h"
 
 CMapLabel::CMapLabel(QWidget *parent) :
@@ -70,6 +71,8 @@ void CMapLabel::slot_changeSelectGridRect()
 
 void CMapLabel::slot_addTreasureLabel(int index)
 {
+	qDebug() << "slot_addTreasureLabel index:" << index ;
+
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	if ( !p ) { return ; }
 
@@ -164,10 +167,12 @@ void CMapLabel::slot_mouseMove(QMouseEvent *event)
 	if ( g_EditData->getEditMode() == CEditData::kEditMode_Map ) {
 		switch ( m_nMapControllType ) {
 		case kMapControll_Add:
-			addMapGrid(event->pos()) ;
+//			addMapGrid(event->pos()) ;
+			g_EditData->cmd_AddMapGrid(event->pos()) ;
 			break ;
 		case kMapControll_Remove:
-			removeMapGrid(event->pos()) ;
+//			removeMapGrid(event->pos()) ;
+			g_EditData->cmd_DelMapGrid(event->pos()) ;
 			break ;
 		case kMapControll_AddMulti:
 		case kMapControll_RemoveMulti:
@@ -206,10 +211,12 @@ void CMapLabel::slot_mouseRelease(QMouseEvent *event)
 	if ( g_EditData->getEditMode() == CEditData::kEditMode_Map ) {
 		switch ( type ) {
 		case kMapControll_Add:
-			addMapGrid(event->pos()) ;
+//			addMapGrid(event->pos()) ;
+			g_EditData->cmd_AddMapGrid(event->pos()) ;
 			break ;
 		case kMapControll_Remove:
-			removeMapGrid(event->pos()) ;
+//			removeMapGrid(event->pos()) ;
+			g_EditData->cmd_DelMapGrid(event->pos()) ;
 			break ;
 		case kMapControll_AddMulti:
 		case kMapControll_RemoveMulti:
@@ -217,10 +224,12 @@ void CMapLabel::slot_mouseRelease(QMouseEvent *event)
 				for ( int y = m_pDropLabel->pos().y() ; y < event->pos().y() ; y += m_oldDropSize.height() ) {
 					for ( int x = m_pDropLabel->pos().x() ; x < event->pos().x() ; x += m_oldDropSize.width() ) {
 						if ( type == kMapControll_AddMulti ) {
-							addMapGrid(QPoint(x, y)) ;
+//							addMapGrid(QPoint(x, y)) ;
+							g_EditData->cmd_AddMapGrid(QPoint(x, y)) ;
 						}
 						else if ( type == kMapControll_RemoveMulti ) {
-							removeMapGrid(QPoint(x, y)) ;
+//							removeMapGrid(QPoint(x, y)) ;
+							g_EditData->cmd_DelMapGrid(QPoint(x, y)) ;
 						}
 					}
 				}
@@ -235,6 +244,7 @@ void CMapLabel::slot_mouseRelease(QMouseEvent *event)
 		g_EditData->posToGrid(pos, event->pos(), p->mapGridSize) ;
 
 		if ( g_EditData->isSelectTreasure() ) {
+			qDebug() << "move Treasure index:" << g_EditData->getSelTreasureIndex().row() ;
 			p->pModelTreasure->setData(g_EditData->getSelTreasureIndex(), pos, Qt::UserRole) ;
 
 			g_EditData->gridToPos(pos, pos, p->mapGridSize) ;

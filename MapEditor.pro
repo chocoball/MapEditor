@@ -4,38 +4,42 @@
 #
 #-------------------------------------------------
 
-QT			+=	core gui
+QT			+=	core gui xml
 
 TARGET		=	MapEditor
 TEMPLATE	=	app
 
 
-SOURCES		+=	main.cpp				\
-				mainwindow.cpp			\
-				csetting.cpp			\
-				ceditdata.cpp			\
-				cimagelabel.cpp			\
-				cmaplabel.cpp			\
-				cgridlabel.cpp			\
-				csavefile.cpp			\
-				cscrollareaimage.cpp	\
-				clistmodelmap.cpp		\
-				clistmodeltreasure.cpp	\
-				clistmodelpoint.cpp		\
-				ccomboboxdelegate.cpp
+SOURCES		+=	src/main.cpp				\
+				src/mainwindow.cpp			\
+				src/csetting.cpp			\
+				src/ceditdata.cpp			\
+				src/cimagelabel.cpp			\
+				src/cmaplabel.cpp			\
+				src/cgridlabel.cpp			\
+				src/csavefile.cpp			\
+				src/cscrollareaimage.cpp	\
+				src/clistmodelmap.cpp		\
+				src/clistmodeltreasure.cpp	\
+				src/clistmodelpoint.cpp		\
+				src/ccomboboxdelegate.cpp	\
+				src/command.cpp
 
-HEADERS		+=	mainwindow.h			\
-				csetting.h				\
-				ceditdata.h				\
-				include.h				\
-				cimagelabel.h			\
-				cmaplabel.h				\
-				cgridlabel.h			\
-				csavefile.h				\
-				cscrollareaimage.h		\
-				clistmodelmap.h			\
-				clistmodeltreasure.h	\
-				clistmodelpoint.h		\
-				ccomboboxdelegate.h
+HEADERS		+=	src/mainwindow.h			\
+				src/csetting.h				\
+				src/ceditdata.h				\
+				src/include.h				\
+				src/cimagelabel.h			\
+				src/cmaplabel.h				\
+				src/cgridlabel.h			\
+				src/csavefile.h				\
+				src/cscrollareaimage.h		\
+				src/clistmodelmap.h			\
+				src/clistmodeltreasure.h	\
+				src/clistmodelpoint.h		\
+				src/ccomboboxdelegate.h		\
+				src/command.h
 
 FORMS		+=	mainwindow.ui
+
+

@@ -90,6 +90,30 @@ int CListModelMap::addMap(QString str)
 	return row ;
 }
 
+int CListModelMap::addMap(MapData &data, QList<CListModelTreasure::TreasureData> *pTreasureDatas, QList<CListModelPoint::PointData> *pPointDatas)
+{
+	int row = addMap(data.mapName) ;
+	if ( row < 0 ) { return -1 ; }
+	MapData &newMap = m_mapDatas[row] ;
+	newMap.image = data.image ;
+	newMap.imageName = data.imageName ;
+	newMap.imgGridSize = data.imgGridSize ;
+	newMap.mapGridSize = data.mapGridSize ;
+	newMap.gridDatas = data.gridDatas ;
+	newMap.imgDatas = data.imgDatas ;
+	if ( pTreasureDatas ) {
+		for ( int i = 0 ; i < pTreasureDatas->size() ; i ++ ) {
+			newMap.pModelTreasure->addTreasure(pTreasureDatas->at(i).mapGrid, pTreasureDatas->at(i).num) ;
+		}
+	}
+	if ( pPointDatas ) {
+		for ( int i = 0 ; i < pPointDatas->size() ; i ++ ) {
+			newMap.pModelPoint->addPoint(pPointDatas->at(i).mapGrid, pPointDatas->at(i).kind) ;
+		}
+	}
+	return row ;
+}
+
 bool CListModelMap::removeMap(int row)
 {
 	removeRows(row, 1, QModelIndex()) ;

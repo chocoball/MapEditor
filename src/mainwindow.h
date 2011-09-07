@@ -54,6 +54,7 @@ public slots:
 	void slot_clickAddStartPoint() ;
 	void slot_clickAddEndPoint() ;
 
+	void slot_changeDataModified(int index) ;
 signals:
 	void sig_keyPress(QKeyEvent *) ;
 	void sig_keyRelease(QKeyEvent *) ;
@@ -72,11 +73,14 @@ private:
 	void restoreSettings() ;
 	void setSpaceSize() ;
 
+	void dataInit() ;
+
+	bool checkSaveFileChanged() ;
+
 private:
     Ui::MainWindow	*ui;
 
 	QString			m_strSaveFileName ;
-//	QSplitter		*m_pSplitterImage ;
 	QSplitter		*m_pSplitterMap ;
 
 	QSize			m_frameImageSpace ;
@@ -86,6 +90,11 @@ private:
 
 	QAction			*m_pActAddStartPoint ;
 	QAction			*m_pActAddEndPoint ;
+
+	QAction			*m_pActUndo ;
+	QAction			*m_pActRedo ;
+
+	int				m_undoIndex ;
 };
 
 #endif // MAINWINDOW_H

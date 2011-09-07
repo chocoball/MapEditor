@@ -3,8 +3,10 @@
 
 #include <QtGui>
 #include <QSortFilterProxyModel>
+#include <QUndoStack>
 #include "include.h"
 #include "clistmodelmap.h"
+#include "command.h"
 
 class CMapLabel ;
 class CImageLabel ;
@@ -67,6 +69,47 @@ public:
 		return &p->pModelPoint->getPoint(getSelPointIndex().row()) ;
 	}
 
+	// マップ追加 コマンド
+	void cmd_addMap(QString mapName, QSize mapGrid, QSize imgGrid)
+	{
+		m_pUndoStack->push(new Command_AddMap(mapName, mapGrid, imgGrid)) ;
+	}
+	// マップ削除 コマンド
+	void cmd_delMap(int row)
+	{
+		m_pUndoStack->push(new Command_DelMap(row)) ;
+	}
+	// お宝追加 コマンド
+	void cmd_addTreasure()
+	{
+		m_pUndoStack->push(new Command_AddTreasure()) ;
+	}
+	// お宝削除 コマンド
+	void cmd_delTreasure(int row)
+	{
+		m_pUndoStack->push(new Command_DelTreasure(row)) ;
+	}
+	// 位置追加 コマンド
+	void cmd_AddPoint(int kind)
+	{
+		m_pUndoStack->push(new Command_AddPoint(kind)) ;
+	}
+	// 位置削除 コマンド
+	void cmd_DelPoint(int row)
+	{
+		m_pUndoStack->push(new Command_DelPoint(row)) ;
+	}
+	// マップグリッド追加 コマンド
+	void cmd_AddMapGrid(QPoint basePos)
+	{
+		m_pUndoStack->push(new Command_AddMapGrid(basePos)) ;
+	}
+	// マップグリッド削除 コマンド
+	void cmd_DelMapGrid(QPoint basePos)
+	{
+		m_pUndoStack->push(new Command_DelMapGrid(basePos)) ;
+	}
+
 	kAccessor(QPoint, m_selStartGrid, SelStartGrid)
 	kAccessor(QPoint, m_selEndGrid, SelEndGrid)
 	kAccessor(CImageLabel*, m_pImageLabel, ImageLabel)
@@ -76,6 +119,7 @@ public:
 	kAccessor(QModelIndex, m_selectPointIndex, SelPointIndex)
 	kAccessor(int, m_editMode, EditMode)
 	kAccessor(CListModelMap*, m_pModelMap, ModelMap)
+	kAccessor(QUndoStack*, m_pUndoStack, UndoStack)
 
 private:
 };

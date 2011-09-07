@@ -8,6 +8,7 @@ CEditData::CEditData()
 	m_pMapLabel = NULL ;
 
 	m_pModelMap = NULL ;
+	m_pUndoStack = NULL ;
 }
 
 void CEditData::release()
@@ -15,6 +16,10 @@ void CEditData::release()
 	if ( m_pModelMap ) {
 		delete m_pModelMap ;
 		m_pModelMap = NULL ;
+	}
+	if ( m_pUndoStack ) {
+		delete m_pUndoStack ;
+		m_pUndoStack = NULL ;
 	}
 }
 

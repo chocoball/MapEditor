@@ -22,6 +22,17 @@ public:
 	explicit CMapLabel(QWidget *parent = 0);
 
 	void updateLabels() ;
+
+	void addMapGrid(const QPoint mapGrid, const QPoint imgGrid) ;
+	void removeMapGrid(const QPoint basePos) ;
+
+	int getGridLabelIndex(QPoint grid) ;
+
+	void releaseMapTipLabel(int index = -1)
+	{
+		releaseTipLabel(m_TipLabel, index) ;
+	}
+
 signals:
 
 public slots:
@@ -48,12 +59,8 @@ private:
 		return getGridLabelIndex(QPoint(x, y)) ;
 	}
 
-	int getGridLabelIndex(QPoint grid) ;
-
 	void addMapGrid(const QPoint basePos) ;
-	void addMapGrid(const QPoint mapGrid, const QPoint imgGrid) ;
 
-	void removeMapGrid(const QPoint basePos) ;
 	void makeDropLabel(QPoint pos, QPoint gridSt, QPoint gridEnd) ;
 
 	void releaseTipLabel(QList<TipLabel> &label, int index = -1) ;

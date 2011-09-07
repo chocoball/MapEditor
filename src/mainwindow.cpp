@@ -17,8 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	g_EditData->setModelMap(new CListModelMap(this)) ;
-	ui->listView_map->setModel(g_EditData->getModelMap());
+	dataInit() ;
 
 	CComboBoxDelegate *pDelegate = new CComboBoxDelegate(this) ;
 	QStringList dispList ;
@@ -61,6 +60,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->action_Save->setShortcut(QKeySequence::Save);
 	ui->action_SaveAs->setShortcut(QKeySequence::SaveAs);
 
+	m_pActUndo = g_EditData->getUndoStack()->createUndoAction(this, trUtf8("元に戻す")) ;
+	m_pActUndo->setShortcuts(QKeySequence::Undo);
+	m_pActRedo = g_EditData->getUndoStack()->createRedoAction(this, trUtf8("やり直す")) ;
+	m_pActRedo->setShortcuts(QKeySequence::Redo);
+	ui->menu_Edit->addAction(m_pActUndo) ;
+	ui->menu_Edit->addAction(m_pActRedo) ;
+
 	connect(ui->action_Open, SIGNAL(triggered()), this, SLOT(slot_fileOpen())) ;
 	connect(ui->action_Save, SIGNAL(triggered()), this, SLOT(slot_fileSave())) ;
 	connect(ui->action_SaveAs, SIGNAL(triggered()), this, SLOT(slot_fileSaveAs())) ;
@@ -87,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->pushButton_pos_del, SIGNAL(clicked()), this, SLOT(slot_pushDelPoint())) ;
 	connect(m_pActAddStartPoint, SIGNAL(triggered()), this, SLOT(slot_clickAddStartPoint())) ;
 	connect(m_pActAddEndPoint, SIGNAL(triggered()), this, SLOT(slot_clickAddEndPoint())) ;
+	connect(g_EditData->getUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(slot_changeDataModified(int))) ;
 }
 
 MainWindow::~MainWindow()
@@ -95,8 +102,13 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-void MainWindow::closeEvent(QCloseEvent *)
+void MainWindow::closeEvent(QCloseEvent *event)
 {
+	if ( !checkSaveFileChanged() ) {
+		event->ignore();
+		return ;
+	}
+
 	QSize size ;
 	size.setWidth(ui->spinBox_grid_w_img->value()) ;
 	size.setHeight(ui->spinBox_grid_h_img->value()) ;
@@ -359,12 +371,9 @@ void MainWindow::slot_clickPushAdd()
 	if ( !bOk )				{ return ; }
 	if ( str.isEmpty() )	{ return ; }
 
-	int index = g_EditData->getModelMap()->addMap(str) ;
-	if ( index >= 0 ) {
-		CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(index) ;
-		data.imgGridSize = QSize(ui->spinBox_grid_w_img->value(), ui->spinBox_grid_h_img->value()) ;
-		data.mapGridSize = QSize(ui->spinBox_grid_w_map->value(), ui->spinBox_grid_h_map->value()) ;
-	}
+	QSize mapGrid = QSize(ui->spinBox_grid_w_map->value(), ui->spinBox_grid_h_map->value()) ;
+	QSize imgGrid = QSize(ui->spinBox_grid_w_img->value(), ui->spinBox_grid_h_img->value()) ;
+	g_EditData->cmd_addMap(str, mapGrid, imgGrid) ;
 }
 
 // 削除 押下
@@ -381,19 +390,16 @@ void MainWindow::slot_clickedListViewMap(QModelIndex index)
 {
 	qDebug() << "slot_clickedListViewMap" ;
 
-	QModelIndex old = g_EditData->getSelMapIndex() ;
 	g_EditData->setSelMapIndex(index) ;
 
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	if ( p ) {
-		if ( old != index ) {
-			ui->spinBox_grid_w_img->setValue(p->imgGridSize.width());
-			ui->spinBox_grid_h_img->setValue(p->imgGridSize.height());
-			ui->spinBox_grid_w_map->setValue(p->mapGridSize.width());
-			ui->spinBox_grid_h_map->setValue(p->mapGridSize.height());
+		ui->spinBox_grid_w_img->setValue(p->imgGridSize.width());
+		ui->spinBox_grid_h_img->setValue(p->imgGridSize.height());
+		ui->spinBox_grid_w_map->setValue(p->mapGridSize.width());
+		ui->spinBox_grid_h_map->setValue(p->mapGridSize.height());
 
-			g_EditData->update() ;
-		}
+		g_EditData->update() ;
 
 		ui->listView_treasure->setModel(p->pModelTreasure) ;
 		ui->listView_point->setModel(p->pModelPoint) ;
@@ -430,10 +436,8 @@ void MainWindow::slot_pushAddTreasure()
 {
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	if ( !p ) { return ; }
-	int row = p->pModelTreasure->addTreasure(QPoint(), 1) ;
-	if ( row >= 0 ) {
-		g_EditData->getMapLabel()->slot_addTreasureLabel(row) ;
-	}
+
+	g_EditData->cmd_addTreasure();
 }
 
 // 宝削除 押下
@@ -443,8 +447,7 @@ void MainWindow::slot_pushDelTreasure()
 	if ( !p ) { return ; }
 	if ( !g_EditData->isSelectTreasure() ) { return ; }
 
-	p->pModelTreasure->removeTreasure(ui->listView_treasure->currentIndex().row());
-	g_EditData->getMapLabel()->slot_removeTreasureLabel(ui->listView_treasure->currentIndex().row()) ;
+	g_EditData->cmd_delTreasure(ui->listView_treasure->currentIndex().row());
 }
 
 // 開始、終了位置 追加
@@ -463,30 +466,36 @@ void MainWindow::slot_pushDelPoint()
 	if ( !p ) { return ; }
 	if ( !g_EditData->isSelectPoint() ) { return ; }
 
-	p->pModelPoint->removePoint(ui->listView_point->currentIndex().row()) ;
-	g_EditData->getMapLabel()->slot_removePointLabel(ui->listView_point->currentIndex().row());
+	g_EditData->cmd_DelPoint(ui->listView_point->currentIndex().row());
 }
 
+// 開始位置 追加
 void MainWindow::slot_clickAddStartPoint()
 {
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	qDebug() << "slot_clickAddStartPoint:" << p ;
 	if ( !p ) { return ; }
 
-	int row = p->pModelPoint->addPoint(QPoint(), 0) ;
-	if ( row >= 0 ) {
-		g_EditData->getMapLabel()->slot_addPointLabel(row) ;
-	}
+	g_EditData->cmd_AddPoint(0) ;
 }
 
+// 終了位置 追加
 void MainWindow::slot_clickAddEndPoint()
 {
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	if ( !p ) { return ; }
 
-	int row = p->pModelPoint->addPoint(QPoint(), 1) ;
-	if ( row >= 0 ) {
-		g_EditData->getMapLabel()->slot_addPointLabel(row) ;
+	g_EditData->cmd_AddPoint(1) ;
+}
+
+// コマンド 変更
+void MainWindow::slot_changeDataModified(int index)
+{
+	if ( m_undoIndex == index ) {
+		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
+	}
+	else {	// 編集してる
+		setWindowTitle(tr(kExecName"*[%1]").arg(m_strSaveFileName));
 	}
 }
 
@@ -539,15 +548,16 @@ void MainWindow::fileOpen(QString &fileName)
 		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
 	}
 	else if ( fileName.toLower().indexOf(kFileExt_XML) > 0 ) {	// XMLファイル
-		g_EditData->release() ;
-		g_EditData->setModelMap(new CListModelMap(this)) ;
-		ui->listView_map->setModel(g_EditData->getModelMap()) ;
+		if ( !checkSaveFileChanged() ) {
+			// キャンセルした
+			return ;
+		}
+
+		dataInit() ;
 
 		CSaveFileXml data ;
 		if ( !data.read(fileName) ) {
-			g_EditData->release() ;
-			g_EditData->setModelMap(new CListModelMap(this)) ;
-			ui->listView_map->setModel(g_EditData->getModelMap()) ;
+			dataInit() ;
 
 			QMessageBox::warning(this, trUtf8("エラー"), trUtf8("読み込みに失敗しました:%1").arg(fileName)) ;
 			return ;
@@ -567,6 +577,7 @@ void MainWindow::fileWrite(QString &fileName)
 		g_Setting->setFileSaveDir(fileName) ;
 		m_strSaveFileName = fileName ;
 		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
+		m_undoIndex = g_EditData->getUndoStack()->index() ;
 	}
 	else if ( fileName.indexOf(kFileExt_XML) > 0 ) {
 		g_Setting->setFileSaveDir(fileName) ;
@@ -574,9 +585,11 @@ void MainWindow::fileWrite(QString &fileName)
 		CSaveFileXml data ;
 		if ( !data.write(fileName) ) {
 			QMessageBox::warning(this, trUtf8("エラー"), trUtf8("保存失敗")) ;
+			return ;
 		}
 		m_strSaveFileName = fileName ;
 		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
+		m_undoIndex = g_EditData->getUndoStack()->index() ;
 	}
 }
 
@@ -600,3 +613,44 @@ void MainWindow::setSpaceSize()
 	m_frameTreeSpace = QSize(10, 60) ;
 	m_windowSpace = QSize(10, 26) ;
 }
+
+void MainWindow::dataInit()
+{
+	if ( g_EditData->getModelMap() ) {
+		delete g_EditData->getModelMap() ;
+	}
+	g_EditData->setModelMap(new CListModelMap(this)) ;
+	ui->listView_map->setModel(g_EditData->getModelMap());
+
+	if ( g_EditData->getUndoStack() ) {
+		g_EditData->getUndoStack()->clear();
+	}
+	else {
+		g_EditData->setUndoStack(new QUndoStack(this)) ;
+	}
+
+	m_undoIndex = 0 ;
+}
+
+bool MainWindow::checkSaveFileChanged()
+{
+	int index = g_EditData->getUndoStack()->index() ;
+	if ( index != m_undoIndex ) {
+		QMessageBox::StandardButton reply = QMessageBox::question(this, trUtf8("確認"), trUtf8("現在のファイルを保存しますか？"),
+																  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel) ;
+		if ( reply == QMessageBox::Yes ) {		// 保存する
+			slot_fileSave();
+			m_undoIndex = index ;
+		}
+		else if ( reply == QMessageBox::Cancel ) {	// キャンセル
+			return false ;
+		}
+	}
+	return true ;
+}
+
+
+
+
+
+
