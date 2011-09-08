@@ -109,6 +109,11 @@ public:
 	{
 		m_pUndoStack->push(new Command_DelMapGrid(basePos)) ;
 	}
+	// お宝移動 コマンド
+	void cmd_MoveTreasure(QPoint mapGrid, int index)
+	{
+		m_pUndoStack->push(new Command_MoveTreasure(mapGrid, index)) ;
+	}
 
 	kAccessor(QPoint, m_selStartGrid, SelStartGrid)
 	kAccessor(QPoint, m_selEndGrid, SelEndGrid)

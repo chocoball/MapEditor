@@ -122,8 +122,8 @@ public:
 	bool insertRows(int row, int count, const QModelIndex &parent) ;
 	bool removeRows(int row, int count, const QModelIndex &parent) ;
 
-	int addMap(QString str) ;
-	int addMap(MapData &data, QList<CListModelTreasure::TreasureData> *pTreasureDatas, QList<CListModelPoint::PointData> *pPointDatas) ;
+	int addMap(QString str, int row = -1) ;
+	int addMap(MapData &data, QList<CListModelTreasure::TreasureData> *pTreasureDatas, QList<CListModelPoint::PointData> *pPointDatas, int row) ;
 	bool removeMap(int row) ;
 
 	MapData &getMap(int row) { return m_mapDatas[row] ; }

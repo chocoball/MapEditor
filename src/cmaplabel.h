@@ -23,10 +23,16 @@ public:
 
 	void updateLabels() ;
 
-	void addMapGrid(const QPoint mapGrid, const QPoint imgGrid) ;
-	void removeMapGrid(const QPoint basePos) ;
-
 	int getGridLabelIndex(QPoint grid) ;
+
+	void addMapGrid(const QPoint mapGrid, const QPoint imgGrid) ;
+	void addMapGrid(const QPoint mapPos, const QPoint imgStGrid, const QPoint imgEndGrid,
+					const QSize mapGridSize, const QSize imgGridSize, CListModelMap::MapData &data) ;
+	void addMapGrid(const QPoint mapPos, const QPoint mapGrid, QImage img) ;
+	void removeMapGrid(const QPoint mapPos, const QPoint imgStGrid, const QPoint imgEndGrid,
+					   const QSize mapGridSize, CListModelMap::MapData &data) ;
+
+	void moveTreasureLabel(const int index, const QPoint pos) ;
 
 	void releaseMapTipLabel(int index = -1)
 	{
@@ -59,7 +65,7 @@ private:
 		return getGridLabelIndex(QPoint(x, y)) ;
 	}
 
-	void addMapGrid(const QPoint basePos) ;
+//	void addMapGrid(const QPoint basePos) ;
 
 	void makeDropLabel(QPoint pos, QPoint gridSt, QPoint gridEnd) ;
 
@@ -80,6 +86,7 @@ private:
 	QLabel				*m_pDropLabel ;
 	CGridLabel			*m_pGridLabel ;
 	QSize				m_oldDropSize ;
+	QPoint				m_oldDropPos ;
 };
 
 #endif // CMAPLABEL_H

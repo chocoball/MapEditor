@@ -28,7 +28,7 @@ public:
 	bool insertRows(int row, int count, const QModelIndex &parent) ;
 	bool removeRows(int row, int count, const QModelIndex &parent) ;
 
-	int addPoint(QPoint mapGrid, int kind) ;
+	int addPoint(QPoint mapGrid, int kind, int row = -1) ;
 	void removePoint(QPoint mapGrid) ;
 	void removePoint(int index) ;
 

@@ -71,15 +71,17 @@ bool CListModelPoint::removeRows(int row, int count, const QModelIndex &parent)
 {
 	beginRemoveRows(QModelIndex(), row, row+count-1) ;
 	for ( int i = 0 ; i < count ; i ++ ) {
-		m_datas.removeAt(i) ;
+		m_datas.removeAt(row) ;
 	}
 	endRemoveRows() ;
 	return true ;
 }
 
-int CListModelPoint::addPoint(QPoint mapGrid, int kind)
+int CListModelPoint::addPoint(QPoint mapGrid, int kind, int row)
 {
-	int row = rowCount(QModelIndex()) ;
+	if ( row < 0 ) {
+		row = rowCount(QModelIndex()) ;
+	}
 	insertRows(row, 1, QModelIndex()) ;
 	QModelIndex index = this->index(row) ;
 

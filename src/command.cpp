@@ -51,7 +51,7 @@ void Command_DelMap::redo()
 
 void Command_DelMap::undo()
 {
-	m_row = g_EditData->getModelMap()->addMap(m_mapData, &m_treasureDatas, &m_pointDatas) ;
+	m_row = g_EditData->getModelMap()->addMap(m_mapData, &m_treasureDatas, &m_pointDatas, m_row) ;
 }
 
 /****************************************************
@@ -173,7 +173,7 @@ void Command_DelPoint::undo()
 	if ( m_mapRow >= 0 ) {
 		CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
 
-		m_pointRow = data.pModelPoint->addPoint(m_pointData.mapGrid, m_pointData.kind) ;
+		m_pointRow = data.pModelPoint->addPoint(m_pointData.mapGrid, m_pointData.kind, m_pointRow) ;
 		if ( m_pointRow >= 0 ) {
 			g_EditData->getMapLabel()->slot_addPointLabel(m_pointRow) ;
 		}
@@ -186,54 +186,31 @@ void Command_DelPoint::undo()
 Command_AddMapGrid::Command_AddMapGrid(QPoint basePos) :
 	QUndoCommand(QObject::trUtf8("マップグリッド追加"))
 {
-	m_bAdd = false ;
-
-	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
-	if ( !p ) { return ; }
+	m_mapRow = -1 ;
+	if ( !g_EditData->getSelectMapData() ) { return ; }
 
 	m_mapRow = g_EditData->getSelMapIndex().row() ;
+	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+
 	m_basePos = basePos ;
-	m_mapGridSize = p->mapGridSize ;
+	m_mapGridSize = data.mapGridSize ;
+	m_imgGridSize = data.imgGridSize ;
 	m_stGrid = g_EditData->getSelStartGrid() ;
 	m_endGrid = g_EditData->getSelEndGrid() ;
-	m_bAdd = true ;
 }
 
 void Command_AddMapGrid::redo()
 {
-	if ( !m_bAdd ) { return ; }
-
+	if ( m_mapRow < 0 ) { return ; }
 	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
-
-	for ( int y = m_stGrid.y() ; y <= m_stGrid.y() ; y ++ ) {
-		for ( int x = m_endGrid.x() ; x <= m_endGrid.x() ; x ++ ) {
-			QPoint imgGrid = QPoint(x, y) ;
-			QPoint mapGrid = m_basePos + QPoint(x-m_stGrid.x(), y-m_stGrid.y()) ;
-			g_EditData->getMapLabel()->addMapGrid(mapGrid, imgGrid) ;
-
-			data.addGridData(mapGrid, imgGrid) ;
-		}
-	}
+	g_EditData->getMapLabel()->addMapGrid(m_basePos, m_stGrid, m_endGrid, m_mapGridSize, m_imgGridSize, data) ;
 }
 
 void Command_AddMapGrid::undo()
 {
-	if ( !m_bAdd ) { return ; }
-
+	if ( m_mapRow < 0 ) { return ; }
 	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
-
-	for ( int y = m_stGrid.y() ; y <= m_stGrid.y() ; y ++ ) {
-		for ( int x = m_endGrid.x() ; x <= m_endGrid.x() ; x ++ ) {
-			QPoint mapGrid = m_basePos + QPoint(x-m_stGrid.x(), y-m_stGrid.y()) ;
-
-			int index = g_EditData->getMapLabel()->getGridLabelIndex(mapGrid) ;
-			if ( index >= 0 ) {
-				g_EditData->getMapLabel()->releaseMapTipLabel(index) ;
-			}
-
-			data.removeGridData(mapGrid) ;
-		}
-	}
+	g_EditData->getMapLabel()->removeMapGrid(m_basePos, m_stGrid, m_endGrid, m_mapGridSize, data) ;
 }
 
 /****************************************************
@@ -242,34 +219,41 @@ void Command_AddMapGrid::undo()
 Command_DelMapGrid::Command_DelMapGrid(QPoint basePos) :
 	QUndoCommand(QObject::trUtf8("マップグリッド削除"))
 {
-	m_bDel = false ;
-
-	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
-	if ( !p ) { return ; }
+	m_mapRow = -1 ;
+	if ( !g_EditData->getSelectMapData() ) { return ; }
 
 	m_mapRow = g_EditData->getSelMapIndex().row() ;
+	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+
 	m_basePos = basePos ;
-	m_mapGridSize = p->mapGridSize ;
+	m_mapGridSize = data.mapGridSize ;
+	m_imgGridSize = data.imgGridSize ;
 	m_stGrid = g_EditData->getSelStartGrid() ;
 	m_endGrid = g_EditData->getSelEndGrid() ;
-	m_bDel = true ;
 }
 
 void Command_DelMapGrid::redo()
 {
-	if ( !m_bDel ) { return ; }
+	if ( m_mapRow < 0 ) { return ; }
 
 	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+	QPoint baseGrid ;
 
-	for ( int y = m_stGrid.y() ; y <= m_stGrid.y() ; y ++ ) {
-		for ( int x = m_endGrid.x() ; x <= m_endGrid.x() ; x ++ ) {
-			QPoint mapGrid = m_basePos + QPoint(x-m_stGrid.x(), y-m_stGrid.y()) ;
+	m_grids.clear();
+	g_EditData->posToGrid(baseGrid, m_basePos, m_mapGridSize) ;
+	for ( int y = m_stGrid.y() ; y <= m_endGrid.y() ; y ++ ) {
+		for ( int x = m_stGrid.x() ; x <= m_endGrid.x() ; x ++ ) {
+			QPoint mapGrid = baseGrid + QPoint(x-m_stGrid.x(), y-m_stGrid.y()) ;
 
 			int index = g_EditData->getMapLabel()->getGridLabelIndex(mapGrid) ;
 			if ( index >= 0 ) {
 				g_EditData->getMapLabel()->releaseMapTipLabel(index) ;
 			}
-
+			index = data.getGridDataIndex(mapGrid) ;
+			if ( index >= 0 ) {
+				CListModelMap::GridData d = data.getGridData(index) ;
+				m_grids.append(d) ;
+			}
 			data.removeGridData(mapGrid) ;
 		}
 	}
@@ -277,19 +261,53 @@ void Command_DelMapGrid::redo()
 
 void Command_DelMapGrid::undo()
 {
-	if ( !m_bDel ) { return ; }
-
+	if ( m_mapRow < 0 ) { return ; }
 	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
 
-	for ( int y = m_stGrid.y() ; y <= m_stGrid.y() ; y ++ ) {
-		for ( int x = m_endGrid.x() ; x <= m_endGrid.x() ; x ++ ) {
-			QPoint imgGrid = QPoint(x, y) ;
-			QPoint mapGrid = m_basePos + QPoint(x-m_stGrid.x(), y-m_stGrid.y()) ;
-			g_EditData->getMapLabel()->addMapGrid(mapGrid, imgGrid) ;
-
-			data.addGridData(mapGrid, imgGrid) ;
-		}
+	for ( int i = 0 ; i < m_grids.size() ; i ++ ) {
+		CListModelMap::GridData grid = m_grids[i] ;
+		g_EditData->getMapLabel()->addMapGrid(m_basePos, grid.imageGrid, grid.imageGrid, m_mapGridSize, m_imgGridSize, data) ;
 	}
 }
 
+/****************************************************
+  お宝移動
+****************************************************/
+Command_MoveTreasure::Command_MoveTreasure(QPoint mapGrid, int treasureIndex) :
+	QUndoCommand(QObject::trUtf8("お宝移動"))
+{
+	m_mapRow = -1 ;
+	if ( !g_EditData->getSelectMapData() ) { return ; }
 
+	m_mapRow = g_EditData->getSelMapIndex().row() ;
+	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+
+	m_mapGrid = mapGrid ;
+	m_treasureIndex = treasureIndex ;
+	m_mapGridSize = data.mapGridSize ;
+	m_oldGrid = data.pModelTreasure->getTreasure(treasureIndex).mapGrid ;
+}
+
+void Command_MoveTreasure::redo()
+{
+	if ( m_mapRow < 0 ) { return ; }
+
+	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+	data.pModelTreasure->setData(data.pModelTreasure->index(m_treasureIndex), m_mapGrid, Qt::UserRole) ;
+
+	QPoint pos ;
+	g_EditData->gridToPos(pos, m_mapGrid, m_mapGridSize) ;
+	g_EditData->getMapLabel()->moveTreasureLabel(m_treasureIndex, pos) ;
+}
+
+void Command_MoveTreasure::undo()
+{
+	if ( m_mapRow < 0 ) { return ; }
+
+	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+	data.pModelTreasure->setData(data.pModelTreasure->index(m_treasureIndex), m_oldGrid, Qt::UserRole) ;
+
+	QPoint pos ;
+	g_EditData->gridToPos(pos, m_oldGrid, m_mapGridSize) ;
+	g_EditData->getMapLabel()->moveTreasureLabel(m_treasureIndex, pos) ;
+}

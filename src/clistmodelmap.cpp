@@ -74,9 +74,11 @@ bool CListModelMap::removeRows(int row, int count, const QModelIndex &parent)
 	return true ;
 }
 
-int CListModelMap::addMap(QString str)
+int CListModelMap::addMap(QString str, int row)
 {
-	int row = rowCount(QModelIndex()) ;
+	if ( row < 0 ) {
+		row = rowCount(QModelIndex()) ;
+	}
 	insertRows(row, 1, QModelIndex()) ;
 
 	QModelIndex index = this->index(row, 0, QModelIndex()) ;
@@ -90,9 +92,9 @@ int CListModelMap::addMap(QString str)
 	return row ;
 }
 
-int CListModelMap::addMap(MapData &data, QList<CListModelTreasure::TreasureData> *pTreasureDatas, QList<CListModelPoint::PointData> *pPointDatas)
+int CListModelMap::addMap(MapData &data, QList<CListModelTreasure::TreasureData> *pTreasureDatas, QList<CListModelPoint::PointData> *pPointDatas, int row)
 {
-	int row = addMap(data.mapName) ;
+	row = addMap(data.mapName, row) ;
 	if ( row < 0 ) { return -1 ; }
 	MapData &newMap = m_mapDatas[row] ;
 	newMap.image = data.image ;

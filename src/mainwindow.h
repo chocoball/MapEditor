@@ -55,6 +55,7 @@ public slots:
 	void slot_clickAddEndPoint() ;
 
 	void slot_changeDataModified(int index) ;
+
 signals:
 	void sig_keyPress(QKeyEvent *) ;
 	void sig_keyRelease(QKeyEvent *) ;

@@ -105,12 +105,12 @@ public:
 	void redo() ;
 
 private:
-	QPoint		m_basePos ;
-	QSize		m_mapGridSize ;
-	QPoint		m_stGrid ;
-	QPoint		m_endGrid ;
-	bool		m_bAdd ;
-	int			m_mapRow ;
+	QPoint					m_basePos ;
+	QSize					m_mapGridSize ;
+	QSize					m_imgGridSize ;
+	QPoint					m_stGrid ;
+	QPoint					m_endGrid ;
+	int						m_mapRow ;
 };
 
 // マップグリッド削除
@@ -123,14 +123,31 @@ public:
 	void redo() ;
 
 private:
-	QPoint		m_basePos ;
-	QSize		m_mapGridSize ;
-	QPoint		m_stGrid ;
-	QPoint		m_endGrid ;
-	bool		m_bDel ;
-	int			m_mapRow ;
+	QPoint							m_basePos ;
+	QSize							m_mapGridSize ;
+	QSize							m_imgGridSize ;
+	QPoint							m_stGrid ;
+	QPoint							m_endGrid ;
+	int								m_mapRow ;
+	QList<CListModelMap::GridData>	m_grids ;
 };
 
+// お宝移動
+class Command_MoveTreasure : public QUndoCommand
+{
+public:
+	Command_MoveTreasure(QPoint mapGrid, int treasureIndex) ;
+
+	void undo() ;
+	void redo() ;
+
+private:
+	int					m_mapRow ;
+	int					m_treasureIndex ;
+	QPoint				m_mapGrid ;
+	QSize				m_mapGridSize ;
+	QPoint				m_oldGrid ;
+};
 
 
 #endif // COMMAND_H

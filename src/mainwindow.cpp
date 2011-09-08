@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->action_Open->setShortcut(QKeySequence::Open);
 	ui->action_Save->setShortcut(QKeySequence::Save);
 	ui->action_SaveAs->setShortcut(QKeySequence::SaveAs);
+	ui->action_Quit->setShortcut(QKeySequence::Quit) ;
 
 	m_pActUndo = g_EditData->getUndoStack()->createUndoAction(this, trUtf8("元に戻す")) ;
 	m_pActUndo->setShortcuts(QKeySequence::Undo);
@@ -70,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->action_Open, SIGNAL(triggered()), this, SLOT(slot_fileOpen())) ;
 	connect(ui->action_Save, SIGNAL(triggered()), this, SLOT(slot_fileSave())) ;
 	connect(ui->action_SaveAs, SIGNAL(triggered()), this, SLOT(slot_fileSaveAs())) ;
+	connect(ui->action_Quit, SIGNAL(triggered()), this, SLOT(close())) ;
 	connect(ui->spinBox_grid_w_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridW(int))) ;
 	connect(ui->spinBox_grid_h_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridH(int))) ;
 	connect(ui->spinBox_grid_w_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridW(int))) ;
@@ -381,8 +383,7 @@ void MainWindow::slot_clickPushDel()
 {
 	if ( !g_EditData->isSelectMap() ) { return ; }
 
-	CListModelMap *pModelMap = g_EditData->getModelMap() ;
-	pModelMap->removeMap(g_EditData->getSelMapIndex().row()) ;
+	g_EditData->cmd_delMap(g_EditData->getSelMapIndex().row()) ;
 }
 
 // Map 選択
