@@ -237,10 +237,9 @@ void Command_DelMapGrid::redo()
 	if ( m_mapRow < 0 ) { return ; }
 
 	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
-	QPoint baseGrid ;
+	QPoint baseGrid = g_EditData->posToGrid(m_basePos, m_mapGridSize) ;
 
 	m_grids.clear();
-	g_EditData->posToGrid(baseGrid, m_basePos, m_mapGridSize) ;
 	for ( int y = m_stGrid.y() ; y <= m_endGrid.y() ; y ++ ) {
 		for ( int x = m_stGrid.x() ; x <= m_endGrid.x() ; x ++ ) {
 			QPoint mapGrid = baseGrid + QPoint(x-m_stGrid.x(), y-m_stGrid.y()) ;
@@ -295,8 +294,7 @@ void Command_MoveTreasure::redo()
 	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
 	data.pModelTreasure->setData(data.pModelTreasure->index(m_treasureIndex), m_mapGrid, Qt::UserRole) ;
 
-	QPoint pos ;
-	g_EditData->gridToPos(pos, m_mapGrid, m_mapGridSize) ;
+	QPoint pos = g_EditData->gridToPos(m_mapGrid, m_mapGridSize) ;
 	g_EditData->getMapLabel()->moveTreasureLabel(m_treasureIndex, pos) ;
 }
 
@@ -307,7 +305,46 @@ void Command_MoveTreasure::undo()
 	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
 	data.pModelTreasure->setData(data.pModelTreasure->index(m_treasureIndex), m_oldGrid, Qt::UserRole) ;
 
-	QPoint pos ;
-	g_EditData->gridToPos(pos, m_oldGrid, m_mapGridSize) ;
+	QPoint pos = g_EditData->gridToPos(m_oldGrid, m_mapGridSize) ;
 	g_EditData->getMapLabel()->moveTreasureLabel(m_treasureIndex, pos) ;
+}
+
+/****************************************************
+  位置移動
+****************************************************/
+Command_MovePoint::Command_MovePoint(QPoint mapGrid, int pointIndex) :
+	QUndoCommand(QObject::trUtf8("位置移動"))
+{
+	m_mapRow = -1 ;
+	if ( !g_EditData->getSelectMapData() ) { return ; }
+
+	m_mapRow = g_EditData->getSelMapIndex().row() ;
+	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+
+	m_mapGrid = mapGrid ;
+	m_pointIndex = pointIndex ;
+	m_mapGridSize = data.mapGridSize ;
+	m_oldGrid = data.pModelPoint->getPoint(pointIndex).mapGrid ;
+}
+
+void Command_MovePoint::redo()
+{
+	if ( m_mapRow < 0 ) { return ; }
+
+	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+	data.pModelPoint->setData(data.pModelPoint->index(m_pointIndex), m_mapGrid, Qt::UserRole) ;
+
+	QPoint pos = g_EditData->gridToPos(m_mapGrid, m_mapGridSize) ;
+	g_EditData->getMapLabel()->movePointLabel(m_pointIndex, pos) ;
+}
+
+void Command_MovePoint::undo()
+{
+	if ( m_mapRow < 0 ) { return ; }
+
+	CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(m_mapRow) ;
+	data.pModelPoint->setData(data.pModelPoint->index(m_pointIndex), m_oldGrid, Qt::UserRole) ;
+
+	QPoint pos = g_EditData->gridToPos(m_mapGrid, m_mapGridSize) ;
+	g_EditData->getMapLabel()->movePointLabel(m_pointIndex, pos) ;
 }

@@ -522,6 +522,16 @@
     <string>終了</string>
    </property>
   </action>
+  <action name="action_Square">
+   <property name="text">
+    <string>正面</string>
+   </property>
+  </action>
+  <action name="action_Quarter">
+   <property name="text">
+    <string>クォータービュー</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

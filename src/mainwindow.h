@@ -56,6 +56,9 @@ public slots:
 
 	void slot_changeDataModified(int index) ;
 
+	void slot_clickViewSquare() ;
+	void slot_clickViewQuarter() ;
+
 signals:
 	void sig_keyPress(QKeyEvent *) ;
 	void sig_keyRelease(QKeyEvent *) ;

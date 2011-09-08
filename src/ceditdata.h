@@ -16,7 +16,10 @@ class CEditData
 public:
 	enum {
 		kEditMode_Map = 0,
-		kEditMode_Data = 1
+		kEditMode_Data = 1,
+
+		kViewMode_Square = 0,
+		kViewMode_Quarter = 1
 	} ;
 
 private:
@@ -34,8 +37,10 @@ public:
 	void updateMap() ;
 	void updateImage() ;
 
-	bool gridToPos(QPoint &ret, const QPoint &grid, const QSize &gridSize) ;
-	bool posToGrid(QPoint &ret, const QPoint &pos, const QSize &gridSize) ;
+	QPoint gridToPos(const QPoint &grid, const QSize &gridSize) ;
+	QPoint gridToQuarter(const QPoint &grid, const QSize &gridSize, const QSize &worldSize) ;
+	QPoint quarterToGrid(const QPoint &pos, const QSize &gridSize, const QSize &worldSize) ;
+	QPoint posToGrid(const QPoint &pos, const QSize &gridSize) ;
 
 	bool isSelectMap()		{ return getSelMapIndex().isValid() ; }
 	bool isSelectTreasure()	{ return getSelTreasureIndex().isValid() ; }
@@ -114,6 +119,11 @@ public:
 	{
 		m_pUndoStack->push(new Command_MoveTreasure(mapGrid, index)) ;
 	}
+	// 位置移動 コマンド
+	void cmd_MovePoint(QPoint mapGrid, int index)
+	{
+		m_pUndoStack->push(new Command_MovePoint(mapGrid, index)) ;
+	}
 
 	kAccessor(QPoint, m_selStartGrid, SelStartGrid)
 	kAccessor(QPoint, m_selEndGrid, SelEndGrid)
@@ -125,6 +135,7 @@ public:
 	kAccessor(int, m_editMode, EditMode)
 	kAccessor(CListModelMap*, m_pModelMap, ModelMap)
 	kAccessor(QUndoStack*, m_pUndoStack, UndoStack)
+	kAccessor(int, m_viewMode, ViewMode)
 
 private:
 };

@@ -33,6 +33,7 @@ public:
 					   const QSize mapGridSize, CListModelMap::MapData &data) ;
 
 	void moveTreasureLabel(const int index, const QPoint pos) ;
+	void movePointLabel(const int index, const QPoint pos) ;
 
 	void releaseMapTipLabel(int index = -1)
 	{

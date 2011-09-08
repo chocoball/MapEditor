@@ -46,10 +46,10 @@ void CImageLabel::changeSelectGridRect()
 	}
 
 	QPoint st, end, pos ;
-	g_EditData->gridToPos(st, m_selGridSt, p->imgGridSize) ;
-	g_EditData->gridToPos(end, m_selGridEnd, p->imgGridSize) ;
-	g_EditData->posToGrid(pos, m_selStart, p->imgGridSize) ;
-	g_EditData->gridToPos(pos, pos, p->imgGridSize) ;
+	st = g_EditData->gridToPos(m_selGridSt, p->imgGridSize) ;
+	end = g_EditData->gridToPos(m_selGridEnd, p->imgGridSize) ;
+	pos = g_EditData->posToGrid(m_selStart, p->imgGridSize) ;
+	pos = g_EditData->gridToPos(pos, p->imgGridSize) ;
 	end.setX(end.x() + p->imgGridSize.width()) ;
 	end.setY(end.y() + p->imgGridSize.height()) ;
 
@@ -71,7 +71,7 @@ void CImageLabel::slot_mousePress(QMouseEvent *ev)
 	if ( ev->pos().x() < 0 || ev->pos().y() < 0 ) { return ; }
 
 	m_selStart = ev->pos() ;
-	g_EditData->posToGrid(m_selGridSt, m_selStart, p->imgGridSize) ;
+	m_selGridSt = g_EditData->posToGrid(m_selStart, p->imgGridSize) ;
 }
 
 void CImageLabel::slot_mouseMove(QMouseEvent *ev)
@@ -81,7 +81,7 @@ void CImageLabel::slot_mouseMove(QMouseEvent *ev)
 	if ( ev->pos().x() < 0 || ev->pos().y() < 0 ) { return ; }
 
 	m_selEnd = ev->pos() ;
-	g_EditData->posToGrid(m_selGridEnd, m_selEnd, p->imgGridSize) ;
+	m_selGridEnd = g_EditData->posToGrid(m_selEnd, p->imgGridSize) ;
 	g_EditData->setSelStartGrid(m_selGridSt) ;
 	g_EditData->setSelEndGrid(m_selGridEnd) ;
 	g_EditData->updateImage() ;
@@ -94,7 +94,7 @@ void CImageLabel::slot_mouseRelease(QMouseEvent *ev)
 	if ( ev->pos().x() < 0 || ev->pos().y() < 0 ) { return ; }
 
 	m_selEnd = ev->pos() ;
-	g_EditData->posToGrid(m_selGridEnd, m_selEnd, p->imgGridSize) ;
+	m_selGridEnd = g_EditData->posToGrid(m_selEnd, p->imgGridSize) ;
 	g_EditData->setSelStartGrid(m_selGridSt) ;
 	g_EditData->setSelEndGrid(m_selGridEnd) ;
 

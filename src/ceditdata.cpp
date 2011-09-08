@@ -41,17 +41,49 @@ void CEditData::updateImage()
 	m_pImageLabel->updateLabels() ;
 }
 
-bool CEditData::gridToPos(QPoint &ret, const QPoint &grid, const QSize &gridSize)
+QPoint CEditData::gridToPos(const QPoint &grid, const QSize &gridSize)
 {
+	QPoint ret ;
 	ret.setX(grid.x() * gridSize.width());
 	ret.setY(grid.y() * gridSize.height());
-	return true ;
+	return ret ;
 }
 
-bool CEditData::posToGrid(QPoint &ret, const QPoint &pos, const QSize &gridSize)
+QPoint CEditData::gridToQuarter(const QPoint &grid, const QSize &gridSize, const QSize &worldSize)
 {
+	double fsin = sin(45.0*kPI/180.0) ;
+	double fcos = cos(45.0*kPI/180.0) ;
+
+	QPoint pos = gridToPos(grid, gridSize) ;
+	QPoint center = QPoint(worldSize.width()/2, worldSize.height()/2) ;
+	QPoint ret = pos - center ;
+
+	pos = QPoint(ret.x()*fcos - ret.y()*fsin, ret.x()*fsin + ret.y()*fcos) ;
+	pos.setY(pos.y()*fsin) ;
+	ret = center + pos ;
+	return ret ;
+}
+
+QPoint CEditData::quarterToGrid(const QPoint &pos, const QSize &gridSize, const QSize &worldSize)
+{
+	double fsin = sin(-45.0*kPI/180.0) ;
+	double fcos = cos(-45.0*kPI/180.0) ;
+
+	QPoint center = QPoint(worldSize.width()/2, worldSize.height()/2) ;
+	QPoint ret = pos - center ;
+
+	ret.setY(ret.y()*fsin) ;
+	ret = QPoint(ret.x()*fcos - ret.y()*fsin, ret.x()*fsin + ret.y()*fcos) ;
+	ret = center + ret ;
+	ret = posToGrid(ret, gridSize) ;
+	return ret ;
+}
+
+QPoint CEditData::posToGrid(const QPoint &pos, const QSize &gridSize)
+{
+	QPoint ret ;
 	ret.setX(pos.x() / gridSize.width());
 	ret.setY(pos.y() / gridSize.height());
-	return true ;
+	return ret ;
 }
 

@@ -34,6 +34,8 @@ public:
 
 	kAccessor(QSize, m_imgGridSize, ImageGridSize)
 	kAccessor(QSize, m_mapGridSize, MapGridSize)
+
+	kAccessor(int, m_viewMode, ViewMode)
 };
 
 #define g_Setting CSetting::getInstance()

@@ -6,6 +6,7 @@
 #define kKeyWindowState		"state"
 #define kKeyImageGridSize	"img_grid_size"
 #define kKeyMapGridSize		"map_grid_size"
+#define kKeyViewMode		"view_mode"
 
 
 CSetting::CSetting()
@@ -17,6 +18,7 @@ CSetting::CSetting()
 	m_fileSaveDir = settings.value(kKeyFileSaveDir, "./").toString() ;
 	m_imgGridSize = settings.value(kKeyImageGridSize, QSize(16, 16)).toSize() ;
 	m_mapGridSize = settings.value(kKeyMapGridSize, QSize(90, 90)).toSize() ;
+	m_viewMode	  = settings.value(kKeyViewMode, 0).toInt() ;
 	settings.endGroup();
 
 	settings.beginGroup("MainWindow") ;
@@ -54,6 +56,7 @@ void CSetting::writeSetting()
 	settings.setValue(kKeyFileSaveDir, m_fileSaveDir) ;
 	settings.setValue(kKeyImageGridSize, m_imgGridSize) ;
 	settings.setValue(kKeyMapGridSize, m_mapGridSize) ;
+	settings.setValue(kKeyViewMode, m_viewMode) ;
 	settings.endGroup();
 
 	settings.beginGroup("MainWindow") ;

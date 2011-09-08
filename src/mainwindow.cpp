@@ -60,7 +60,18 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->action_Save->setShortcut(QKeySequence::Save);
 	ui->action_SaveAs->setShortcut(QKeySequence::SaveAs);
 	ui->action_Quit->setShortcut(QKeySequence::Quit) ;
-
+#if 0
+	ui->action_Square->setCheckable(true) ;
+	ui->action_Quarter->setCheckable(true) ;
+	if ( g_EditData->getViewMode() == CEditData::kViewMode_Square ) {
+		ui->action_Square->setChecked(true) ;
+		ui->action_Quarter->setChecked(false) ;
+	}
+	else {
+		ui->action_Square->setChecked(false) ;
+		ui->action_Quarter->setChecked(true) ;
+	}
+#endif
 	m_pActUndo = g_EditData->getUndoStack()->createUndoAction(this, trUtf8("元に戻す")) ;
 	m_pActUndo->setShortcuts(QKeySequence::Undo);
 	m_pActRedo = g_EditData->getUndoStack()->createRedoAction(this, trUtf8("やり直す")) ;
@@ -72,6 +83,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->action_Save, SIGNAL(triggered()), this, SLOT(slot_fileSave())) ;
 	connect(ui->action_SaveAs, SIGNAL(triggered()), this, SLOT(slot_fileSaveAs())) ;
 	connect(ui->action_Quit, SIGNAL(triggered()), this, SLOT(close())) ;
+#if 0
+	connect(ui->action_Square, SIGNAL(triggered()), this, SLOT(slot_clickViewSquare())) ;
+	connect(ui->action_Quarter, SIGNAL(triggered()), this, SLOT(slot_clickViewQuarter())) ;
+#endif
 	connect(ui->spinBox_grid_w_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridW(int))) ;
 	connect(ui->spinBox_grid_h_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridH(int))) ;
 	connect(ui->spinBox_grid_w_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridW(int))) ;
@@ -110,6 +125,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		event->ignore();
 		return ;
 	}
+
+//	g_Setting->setViewMode(g_EditData->getViewMode()) ;
 
 	QSize size ;
 	size.setWidth(ui->spinBox_grid_w_img->value()) ;
@@ -500,6 +517,21 @@ void MainWindow::slot_changeDataModified(int index)
 	}
 }
 
+void MainWindow::slot_clickViewSquare()
+{
+	ui->action_Square->setChecked(true) ;
+	ui->action_Quarter->setChecked(false) ;
+	g_EditData->setViewMode(CEditData::kViewMode_Square);
+}
+
+void MainWindow::slot_clickViewQuarter()
+{
+	ui->action_Quarter->setChecked(true) ;
+	ui->action_Square->setChecked(false) ;
+	g_EditData->setViewMode(CEditData::kViewMode_Quarter);
+}
+
+
 // ファイルを開く
 void MainWindow::fileOpen(QString &fileName)
 {
@@ -605,6 +637,8 @@ void MainWindow::restoreSettings()
 	restoreGeometry(g_Setting->getMainWindowGeometry()) ;
 
 	slot_splitterMoveMap(0, 0) ;
+
+//	g_EditData->setViewMode(g_Setting->getViewMode()) ;
 }
 
 void MainWindow::setSpaceSize()

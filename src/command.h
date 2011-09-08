@@ -149,5 +149,22 @@ private:
 	QPoint				m_oldGrid ;
 };
 
+// 位置移動
+class Command_MovePoint : public QUndoCommand
+{
+public:
+	Command_MovePoint(QPoint mapGrid, int pointIndex) ;
+
+	void undo() ;
+	void redo() ;
+
+private:
+	int					m_mapRow ;
+	int					m_pointIndex ;
+	QPoint				m_mapGrid ;
+	QSize				m_mapGridSize ;
+	QPoint				m_oldGrid ;
+};
+
 
 #endif // COMMAND_H

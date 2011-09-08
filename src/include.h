@@ -10,6 +10,7 @@
 
 #define kScreenW	720
 #define kScreenH	480
+#define kPI			3.14159265358979323846
 
 #include "csetting.h"
 #include "ceditdata.h"
