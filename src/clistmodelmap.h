@@ -61,7 +61,7 @@ public:
 			gridDatas.append(GridData(mapGrid, imgGrid)) ;
 		}
 
-		int getGridDataIndex(QPoint mapGrid)
+		int getGridDataIndex(QPoint mapGrid) const
 		{
 			for ( int i = 0 ; i < gridDatas.size() ; i ++ ) {
 				if ( gridDatas[i].mapGrid == mapGrid ) { return i ; }
@@ -81,6 +81,16 @@ public:
 			gridDatas.removeAt(i) ;
 		}
 
+		QSize getMaxGridNum() const
+		{
+			int w = 0, h = 0 ;
+			for ( int i = 0 ; i < gridDatas.size() ; i ++ ) {
+				if ( w < gridDatas[i].mapGrid.x() + 1 ) { w = gridDatas[i].mapGrid.x() + 1 ; }
+				if ( h < gridDatas[i].mapGrid.y() + 1 ) { h = gridDatas[i].mapGrid.y() + 1 ; }
+			}
+			return QSize(w, h) ;
+		}
+
 		// ImageData ------------------------------------------------------
 		void addImageData(QPoint imgGrid, bool bUnit, bool bThrough)
 		{
@@ -88,7 +98,7 @@ public:
 			imgDatas.append(ImageData(imgGrid, bUnit, bThrough)) ;
 		}
 
-		int getImageDataIndex(QPoint imgGrid)
+		int getImageDataIndex(QPoint imgGrid) const
 		{
 			for ( int i = 0 ; i < imgDatas.size() ; i ++ ) {
 				if ( imgDatas[i].grid == imgGrid ) { return i ; }

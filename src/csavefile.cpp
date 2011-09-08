@@ -1,3 +1,4 @@
+#include <QRegExp>
 #include "csavefile.h"
 #include "include.h"
 
@@ -17,6 +18,18 @@ CSaveFileJson::CSaveFileJson()
 
 bool CSaveFileJson::write(QString &fileName)
 {
+	QString str ;
+
+	if ( !toStringMap(str) ) { return false ; }
+
+//	str = str.replace(QRegExp("(\\s|\\t|\\n)"), "") ;
+
+	QFile file(fileName) ;
+	if ( !file.open(QFile::WriteOnly) ) {
+		return false ;
+	}
+	file.write(str.toAscii()) ;
+	file.close() ;
 	return true ;
 }
 
@@ -24,6 +37,105 @@ bool CSaveFileJson::read(QString &fileName)
 {
 	return true ;
 }
+
+bool CSaveFileJson::toStringMap(QString &str)
+{
+	str += "[\n" ;
+	QList<CListModelMap::MapData> &mapDatas = g_EditData->getModelMap()->getList() ;
+	for ( int i = 0 ; i < mapDatas.size() ; i ++ ) {
+		CListModelMap::MapData &data = mapDatas[i] ;
+		QSize gridNum = data.getMaxGridNum() ;
+
+		str += "\t{\n" ;
+		str += "\t\t\"id\": " + data.mapName + ",\n" ;
+		str += QString("\t\t\"grid_num\": [%1, %2],\n").arg(gridNum.width()).arg(gridNum.height()) ;
+		str += QString("\t\t\"map_grid_size\": [%1, %2],\n").arg(data.mapGridSize.width()).arg(data.mapGridSize.height()) ;
+		str += QString("\t\t\"img_grid_size\": [%1, %2],\n").arg(data.imgGridSize.width()).arg(data.imgGridSize.height()) ;
+		str += QString("\t\t\"image_name\": \"%1.png\",\n").arg(QFileInfo(data.imageName).baseName()) ;
+#if 1
+		str += "\t\t\"grid\": [\n" ;
+		for ( int y = 0 ; y < gridNum.height() ; y ++ ) {
+			for ( int x = 0 ; x < gridNum.width() ; x ++ ) {
+				int index = data.getGridDataIndex(QPoint(x, y)) ;
+				if ( index >= 0 ) {
+					CListModelMap::GridData &grid = data.getGridData(index) ;
+					int bUnit = 0 ;
+					int bThrough = 0 ;
+					index = data.getImageDataIndex(grid.imageGrid) ;
+					if ( index >= 0 ) {
+						bUnit = data.getImageData(index).bUnitable ;
+						bThrough = data.getImageData(index).bThrough ;
+					}
+
+					str += "\t\t\t{ " ;
+					str += QString("\"img_grid\": [%1, %2]").arg(grid.imageGrid.x()).arg(grid.imageGrid.y()) ;
+					if ( bUnit ) {
+						str += ", \"bUnit\": 1" ;
+					}
+					if ( bThrough ) {
+						str += ", \"bThrough\": 1" ;
+					}
+					index = data.pModelPoint->getPointIndex(grid.mapGrid) ;
+					if ( index >= 0 ) {
+						str += QString(", \"kind\": %1").arg(data.pModelPoint->getPoint(index).kind+1) ;
+					}
+					index = data.pModelTreasure->getTreasureIndex(grid.mapGrid) ;
+					if ( index >= 0 ) {
+						str += QString(", \"treasure\": %1").arg(data.pModelTreasure->getTreasure(index).num) ;
+					}
+
+					str += " }" ;
+				}
+				else {
+					str += "\t\t\t{ \"img_grid\": [0, 0] }" ;
+				}
+				if ( y != gridNum.height()-1 || x != gridNum.width()-1 ) {
+					str += "," ;
+				}
+				str += "\n" ;
+			}
+		}
+		str += "\t\t]\n" ;
+#else
+		if ( !toStringGridImage(str, data) ) { return false ; }
+		if ( !toStringGridData(str, data) ) { return false ; }
+		if ( !toStringTreasure(str, data) ) { return false ; }
+		if ( !toStringPoint(str, data) ) { return false ; }
+#endif
+		str += "\t}" ;
+		if ( i < mapDatas.size()-1 ) {
+			str += "," ;
+		}
+		str += "\n" ;
+	}
+	str += "]\n" ;
+	return true ;
+}
+
+bool CSaveFileJson::toStringGridImage(QString &str, const CListModelMap::MapData &data)
+{
+	str += "\t\t\"grid_image\": [\n" ;
+
+	str += "\t\t],\n" ;
+	return true ;
+}
+
+bool CSaveFileJson::toStringGridData(QString &str, const CListModelMap::MapData &data)
+{
+	return true ;
+}
+
+bool CSaveFileJson::toStringTreasure(QString &str, const CListModelMap::MapData &data)
+{
+	return true ;
+}
+
+bool CSaveFileJson::toStringPoint(QString &str, const CListModelMap::MapData &data)
+{
+	return true ;
+}
+
+
 
 /*****************************************
   XML 吐き出しクラス

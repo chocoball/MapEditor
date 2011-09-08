@@ -59,6 +59,8 @@ public slots:
 	void slot_clickViewSquare() ;
 	void slot_clickViewQuarter() ;
 
+	void slot_exportJSON() ;
+
 signals:
 	void sig_keyPress(QKeyEvent *) ;
 	void sig_keyRelease(QKeyEvent *) ;

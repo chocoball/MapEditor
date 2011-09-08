@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+	this->resize(this->minimumSize()) ;
 
 	dataInit() ;
 
@@ -49,7 +50,6 @@ MainWindow::MainWindow(QWidget *parent) :
 								0,
 								tabWidget->width()+ui->frame_map->width()+ui->frame_tree->width(),
 								ui->frame_map->height());
-
 	setSpaceSize() ;
 	restoreSettings() ;
 
@@ -87,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->action_Square, SIGNAL(triggered()), this, SLOT(slot_clickViewSquare())) ;
 	connect(ui->action_Quarter, SIGNAL(triggered()), this, SLOT(slot_clickViewQuarter())) ;
 #endif
+	connect(ui->action_Json, SIGNAL(triggered()), this, SLOT(slot_exportJSON())) ;
 	connect(ui->spinBox_grid_w_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridW(int))) ;
 	connect(ui->spinBox_grid_h_img, SIGNAL(valueChanged(int)), this, SLOT(slot_changeImageGridH(int))) ;
 	connect(ui->spinBox_grid_w_map, SIGNAL(valueChanged(int)), this, SLOT(slot_changeMapGridW(int))) ;
@@ -111,6 +112,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_pActAddStartPoint, SIGNAL(triggered()), this, SLOT(slot_clickAddStartPoint())) ;
 	connect(m_pActAddEndPoint, SIGNAL(triggered()), this, SLOT(slot_clickAddEndPoint())) ;
 	connect(g_EditData->getUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(slot_changeDataModified(int))) ;
+
 }
 
 MainWindow::~MainWindow()
@@ -139,6 +141,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 	g_Setting->setScrollAreaMapGeometry(ui->scrollArea_Map->saveGeometry()) ;
 
+	g_Setting->setFrameMapGeometry(ui->frame_map->saveGeometry()) ;
 	g_Setting->setMainWindowGeometry(saveGeometry()) ;
 	g_Setting->setMainWindowState(saveState(kVersion)) ;
 	g_Setting->writeSetting();
@@ -146,9 +149,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::resizeEvent(QResizeEvent *)
 {
-	QSize size = this->size() - m_windowSpace ;
-	m_pSplitterMap->resize(size) ;
-
+	qDebug() << "resizeEvent" ;
 	slot_splitterMoveMap(0, 0);
 }
 
@@ -169,7 +170,7 @@ void MainWindow::slot_fileOpen()
 											this,
 											tr("Open File"),
 											g_Setting->getFileOpenDir(),
-											tr("All Files (*.*);;Image (*.png);;JSON (*"kFileExt_JSON");;XML (*"kFileExt_XML");;")) ;
+											tr("All Files (*.*);;Image (*.png);;XML (*"kFileExt_XML");;")) ;
 	if ( fileName.isEmpty() ) {
 		return ;
 	}
@@ -194,7 +195,7 @@ void MainWindow::slot_fileSaveAs()
 	QString str = QFileDialog::getSaveFileName(this,
 											   trUtf8("名前を付けて保存"),
 											   g_Setting->getFileSaveDir(),
-											   tr("XML (*"kFileExt_XML");;JSON (*"kFileExt_JSON");;")) ;
+											   tr("XML (*"kFileExt_XML");;")) ;
 	if ( str.isEmpty() ) { return ; }
 
 	fileWrite(str) ;
@@ -229,7 +230,12 @@ void MainWindow::slot_splitterMoveImage(int, int)
 void MainWindow::slot_splitterMoveMap(int, int)
 {
 	QSize size ;
+
+	size = this->size() - m_windowSpace ;
+	m_pSplitterMap->resize(size) ;
+
 	size = ui->frame_map->size() - QSize(ui->scrollArea_Map->x(), ui->scrollArea_Map->y()) - m_frameMapSpace ;
+	qDebug() << "frame_map:" << ui->frame_map->size() << " scrollArea:" << ui->scrollArea_Map->pos() << " size:" << size ;
 	ui->scrollArea_Map->resize(size) ;
 	size = ui->frame_tree->size() - QSize(ui->listView_map->x(), ui->listView_map->y()) - m_frameTreeSpace ;
 	ui->listView_map->resize(size) ;
@@ -531,6 +537,17 @@ void MainWindow::slot_clickViewQuarter()
 	g_EditData->setViewMode(CEditData::kViewMode_Quarter);
 }
 
+// JSON エクスポート
+void MainWindow::slot_exportJSON()
+{
+	QString str = QFileDialog::getSaveFileName(this,
+											   trUtf8("名前を付けて保存"),
+											   g_Setting->getJsonFileSaveDir(),
+											   tr("JSON (*"kFileExt_JSON");;")) ;
+	if ( str.isEmpty() ) { return ; }
+
+	fileWrite(str) ;
+}
 
 // ファイルを開く
 void MainWindow::fileOpen(QString &fileName)
@@ -607,10 +624,13 @@ void MainWindow::fileOpen(QString &fileName)
 void MainWindow::fileWrite(QString &fileName)
 {
 	if ( fileName.indexOf(kFileExt_JSON) > 0 ) {
-		g_Setting->setFileSaveDir(fileName) ;
-		m_strSaveFileName = fileName ;
-		setWindowTitle(tr(kExecName"[%1]").arg(m_strSaveFileName));
-		m_undoIndex = g_EditData->getUndoStack()->index() ;
+		g_Setting->setJsonFileSaveDir(fileName) ;
+
+		CSaveFileJson data ;
+		if ( !data.write(fileName) ) {
+			QMessageBox::warning(this, trUtf8("エラー"), trUtf8("保存失敗")) ;
+			return ;
+		}
 	}
 	else if ( fileName.indexOf(kFileExt_XML) > 0 ) {
 		g_Setting->setFileSaveDir(fileName) ;
@@ -633,10 +653,12 @@ void MainWindow::restoreSettings()
 	ui->spinBox_grid_w_map->setValue(g_Setting->getMapGridSize().width()) ;
 	ui->spinBox_grid_h_map->setValue(g_Setting->getMapGridSize().height()) ;
 
+	ui->frame_map->restoreGeometry(g_Setting->getFrameMapGeometry()) ;
+
 	restoreState(g_Setting->getMainWindowState()) ;
 	restoreGeometry(g_Setting->getMainWindowGeometry()) ;
 
-	slot_splitterMoveMap(0, 0) ;
+//	slot_splitterMoveMap(0, 0) ;
 
 //	g_EditData->setViewMode(g_Setting->getViewMode()) ;
 }

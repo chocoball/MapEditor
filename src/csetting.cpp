@@ -2,8 +2,10 @@
 
 #define kKeyFileOpenDir		"fileOpenDir"
 #define kKeyFileSaveDir		"fileSaveDir"
+#define kKeyJsonFileSaveDir	"jsonFileSaveDir"
 #define kKeyWindowGeometry	"geometry"
 #define kKeyWindowState		"state"
+#define kKeyWindowSize		"size"
 #define kKeyImageGridSize	"img_grid_size"
 #define kKeyMapGridSize		"map_grid_size"
 #define kKeyViewMode		"view_mode"
@@ -14,11 +16,12 @@ CSetting::CSetting()
 	QSettings settings(getFilePath(), getFileFormat()) ;
 
 	settings.beginGroup("Global");
-	m_fileOpenDir = settings.value(kKeyFileOpenDir, "./").toString() ;
-	m_fileSaveDir = settings.value(kKeyFileSaveDir, "./").toString() ;
-	m_imgGridSize = settings.value(kKeyImageGridSize, QSize(16, 16)).toSize() ;
-	m_mapGridSize = settings.value(kKeyMapGridSize, QSize(90, 90)).toSize() ;
-	m_viewMode	  = settings.value(kKeyViewMode, 0).toInt() ;
+	m_fileOpenDir		= settings.value(kKeyFileOpenDir, "./").toString() ;
+	m_fileSaveDir		= settings.value(kKeyFileSaveDir, "./").toString() ;
+	m_jsonFileSaveDir	= settings.value(kKeyJsonFileSaveDir, "./").toString() ;
+	m_imgGridSize		= settings.value(kKeyImageGridSize, QSize(16, 16)).toSize() ;
+	m_mapGridSize		= settings.value(kKeyMapGridSize, QSize(90, 90)).toSize() ;
+	m_viewMode			= settings.value(kKeyViewMode, 0).toInt() ;
 	settings.endGroup();
 
 	settings.beginGroup("MainWindow") ;
@@ -39,6 +42,10 @@ CSetting::CSetting()
 	settings.beginGroup("ScrollAreaMap") ;
 	m_ScrollAreaMapGeometry	= settings.value(kKeyWindowGeometry).toByteArray() ;
 	settings.endGroup();
+
+	settings.beginGroup("FrameMap") ;
+	m_frameMapGeometry = settings.value(kKeyWindowGeometry).toByteArray() ;
+	settings.endGroup();
 }
 
 CSetting::~CSetting()
@@ -54,6 +61,7 @@ void CSetting::writeSetting()
 	settings.beginGroup("Global");
 	settings.setValue(kKeyFileOpenDir, m_fileOpenDir) ;
 	settings.setValue(kKeyFileSaveDir, m_fileSaveDir) ;
+	settings.setValue(kKeyJsonFileSaveDir, m_jsonFileSaveDir) ;
 	settings.setValue(kKeyImageGridSize, m_imgGridSize) ;
 	settings.setValue(kKeyMapGridSize, m_mapGridSize) ;
 	settings.setValue(kKeyViewMode, m_viewMode) ;
@@ -76,5 +84,9 @@ void CSetting::writeSetting()
 
 	settings.beginGroup("ScrollAreaMap") ;
 	settings.setValue(kKeyWindowGeometry, m_ScrollAreaMapGeometry) ;
+	settings.endGroup();
+
+	settings.beginGroup("FrameMap") ;
+	settings.setValue(kKeyWindowGeometry, m_frameMapGeometry) ;
 	settings.endGroup();
 }

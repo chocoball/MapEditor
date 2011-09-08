@@ -239,8 +239,6 @@ void CMapLabel::slot_mousePress(QMouseEvent *event)
 			break ;
 		}
 
-		qDebug() << "mousePress:" << m_nMapControllType ;
-
 		switch ( m_nMapControllType ) {
 		case kMapControll_AddMulti:
 		case kMapControll_RemoveMulti:

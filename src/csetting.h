@@ -24,6 +24,7 @@ public:
 
 	kAccessor(QString, m_fileOpenDir, FileOpenDir)
 	kAccessor(QString, m_fileSaveDir, FileSaveDir)
+	kAccessor(QString, m_jsonFileSaveDir, JsonFileSaveDir)
 	kAccessor(QByteArray, m_MainWindowGeometry, MainWindowGeometry)
 	kAccessor(QByteArray, m_MainWindowState, MainWindowState)
 	kAccessor(QByteArray, m_SplitterMapGeometry, SplitterMapGeometry)
@@ -31,6 +32,7 @@ public:
 	kAccessor(QByteArray, m_LabelImageGeometry, LabelImageGeometry)
 	kAccessor(QByteArray, m_LabelImageState, LabelImageState)
 	kAccessor(QByteArray, m_ScrollAreaMapGeometry, ScrollAreaMapGeometry)
+	kAccessor(QByteArray, m_frameMapGeometry, FrameMapGeometry)
 
 	kAccessor(QSize, m_imgGridSize, ImageGridSize)
 	kAccessor(QSize, m_mapGridSize, MapGridSize)

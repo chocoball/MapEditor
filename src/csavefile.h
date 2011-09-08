@@ -23,6 +23,13 @@ public:
 
 	bool write(QString &fileName) ;
 	bool read(QString &fileName) ;
+
+private:
+	bool toStringMap(QString &str) ;
+	bool toStringGridImage(QString &str, const CListModelMap::MapData &data) ;
+	bool toStringGridData(QString &str, const CListModelMap::MapData &data) ;
+	bool toStringTreasure(QString &str, const CListModelMap::MapData &data) ;
+	bool toStringPoint(QString &str, const CListModelMap::MapData &data) ;
 } ;
 
 // xml 吐き出し class

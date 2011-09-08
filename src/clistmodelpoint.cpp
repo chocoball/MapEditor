@@ -85,8 +85,6 @@ int CListModelPoint::addPoint(QPoint mapGrid, int kind, int row)
 	insertRows(row, 1, QModelIndex()) ;
 	QModelIndex index = this->index(row) ;
 
-	qDebug() << "addPoint index valid:" << index.isValid() ;
-
 	if ( !setData(index, kind, Qt::EditRole) ) { return -1 ; }
 	if ( !setData(index, mapGrid, Qt::UserRole) ) { return -1 ; }
 	return row ;

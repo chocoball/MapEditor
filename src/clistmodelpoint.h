@@ -35,6 +35,14 @@ public:
 	PointData &getPoint(int index) { return m_datas[index] ; }
 	QList<PointData> &getList() { return m_datas ; }
 
+	int getPointIndex(QPoint mapGrid)
+	{
+		for ( int i = 0 ; i < m_datas.size() ; i ++ ) {
+			if ( m_datas[i].mapGrid == mapGrid ) { return i ; }
+		}
+		return -1 ;
+	}
+
 signals:
 
 public slots:

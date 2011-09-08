@@ -125,16 +125,6 @@
      <property name="widgetResizable">
       <bool>false</bool>
      </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>287</width>
-        <height>267</height>
-       </rect>
-      </property>
-     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_setting">
      <property name="geometry">
@@ -203,16 +193,6 @@
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents_2">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>367</width>
-        <height>357</height>
-       </rect>
-      </property>
-     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_grid_2">
      <property name="geometry">
@@ -473,9 +453,17 @@
     <property name="title">
      <string>ファイル</string>
     </property>
+    <widget class="QMenu" name="menu_Export">
+     <property name="title">
+      <string>エクスポート</string>
+     </property>
+     <addaction name="action_Json"/>
+    </widget>
     <addaction name="action_Open"/>
     <addaction name="action_Save"/>
     <addaction name="action_SaveAs"/>
+    <addaction name="separator"/>
+    <addaction name="menu_Export"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -502,21 +490,6 @@
     <string>名前を付けて保存</string>
    </property>
   </action>
-  <action name="action_Undo">
-   <property name="text">
-    <string>元に戻す</string>
-   </property>
-  </action>
-  <action name="action_Redo">
-   <property name="text">
-    <string>やり直す</string>
-   </property>
-  </action>
-  <action name="action">
-   <property name="text">
-    <string>終了</string>
-   </property>
-  </action>
   <action name="action_Quit">
    <property name="text">
     <string>終了</string>
@@ -530,6 +503,11 @@
   <action name="action_Quarter">
    <property name="text">
     <string>クォータービュー</string>
+   </property>
+  </action>
+  <action name="action_Json">
+   <property name="text">
+    <string>JSON</string>
    </property>
   </action>
  </widget>
