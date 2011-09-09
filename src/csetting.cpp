@@ -39,12 +39,14 @@ CSetting::CSetting()
 	m_LabelImageState		= settings.value(kKeyWindowState).toByteArray() ;
 	settings.endGroup();
 
-	settings.beginGroup("ScrollAreaMap") ;
-	m_ScrollAreaMapGeometry	= settings.value(kKeyWindowGeometry).toByteArray() ;
-	settings.endGroup();
-
 	settings.beginGroup("FrameMap") ;
-	m_frameMapGeometry = settings.value(kKeyWindowGeometry).toByteArray() ;
+	m_frameMapSize = settings.value(kKeyWindowSize, QSize(406, 451)) ;
+	settings.endGroup();
+	settings.beginGroup("FrameTree") ;
+	m_frameTreeSize = settings.value(kKeyWindowSize, QSize(121, 441)) ;
+	settings.endGroup();
+	settings.beginGroup("FrameImage") ;
+	m_frameImageSize = settings.value(kKeyWindowSize) ;
 	settings.endGroup();
 }
 
@@ -82,11 +84,15 @@ void CSetting::writeSetting()
 	settings.setValue(kKeyWindowState, m_LabelImageState) ;
 	settings.endGroup();
 
-	settings.beginGroup("ScrollAreaMap") ;
-	settings.setValue(kKeyWindowGeometry, m_ScrollAreaMapGeometry) ;
+	settings.beginGroup("FrameMap") ;
+	settings.setValue(kKeyWindowSize, m_frameMapSize) ;
 	settings.endGroup();
 
-	settings.beginGroup("FrameMap") ;
-	settings.setValue(kKeyWindowGeometry, m_frameMapGeometry) ;
+	settings.beginGroup("FrameTree") ;
+	settings.setValue(kKeyWindowSize, m_frameTreeSize) ;
+	settings.endGroup();
+
+	settings.beginGroup("FrameImage") ;
+	settings.setValue(kKeyWindowSize, m_frameImageSize) ;
 	settings.endGroup();
 }

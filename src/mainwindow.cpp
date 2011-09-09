@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	this->resize(this->minimumSize()) ;
 
 	dataInit() ;
 
@@ -29,28 +28,31 @@ MainWindow::MainWindow(QWidget *parent) :
 	setWindowTitle(kExecName);
 
 	CImageLabel *pLabelImage = new CImageLabel(this) ;
-	pLabelImage->show();
 	ui->scrollArea_Image->setWidget(pLabelImage);
 	g_EditData->setImageLabel(pLabelImage) ;
 
 	CMapLabel *pLabelMap = new CMapLabel(this) ;
-	pLabelMap->show();
 	ui->scrollArea_Map->setWidget(pLabelMap) ;
 	g_EditData->setMapLabel(pLabelMap) ;
 
-	QTabWidget *tabWidget = new QTabWidget(this) ;
-	tabWidget->insertTab(CEditData::kEditMode_Map, ui->frame_image, trUtf8("マップ")) ;
-	tabWidget->insertTab(CEditData::kEditMode_Data, ui->frame_data, trUtf8("データ")) ;
-
 	m_pSplitterMap = new QSplitter(ui->centralWidget) ;
+
+	m_pTabWidget = new QTabWidget(m_pSplitterMap) ;
+	m_pTabWidget->insertTab(CEditData::kEditMode_Map, ui->frame_image, trUtf8("マップ")) ;
+	m_pTabWidget->insertTab(CEditData::kEditMode_Data, ui->frame_data, trUtf8("データ")) ;
+
+	qDebug() << "frame_tree:" << ui->frame_tree->size() ;
+	qDebug() << "frame_image:" << ui->frame_image->size() ;
+
 	m_pSplitterMap->addWidget(ui->frame_tree);
 	m_pSplitterMap->addWidget(ui->frame_map);
-	m_pSplitterMap->addWidget(tabWidget) ;
+	m_pSplitterMap->addWidget(m_pTabWidget) ;
 	m_pSplitterMap->setGeometry(0,
 								0,
-								tabWidget->width()+ui->frame_map->width()+ui->frame_tree->width(),
+								m_pTabWidget->width()+ui->frame_map->width()+ui->frame_tree->width(),
 								ui->frame_map->height());
 	setSpaceSize() ;
+	this->resize(this->minimumSize()) ;
 	restoreSettings() ;
 
 	m_pActAddStartPoint = new QAction(trUtf8("開始位置"), this) ;
@@ -104,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->listView_map, SIGNAL(clicked(QModelIndex)), this, SLOT(slot_clickedListViewMap(QModelIndex))) ;
 	connect(ui->listView_treasure, SIGNAL(clicked(QModelIndex)), this, SLOT(slot_clickedListViewTreasure(QModelIndex))) ;
 	connect(ui->listView_point, SIGNAL(clicked(QModelIndex)), this, SLOT(slot_clickedListViewPoint(QModelIndex))) ;
-	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(slot_tabChanged(int))) ;
+	connect(m_pTabWidget, SIGNAL(currentChanged(int)), this, SLOT(slot_tabChanged(int))) ;
 	connect(ui->pushButton_treasure_add, SIGNAL(clicked()), this, SLOT(slot_pushAddTreasure())) ;
 	connect(ui->pushButton_treasure_del, SIGNAL(clicked()), this, SLOT(slot_pushDelTreasure())) ;
 	connect(ui->pushButton_pos_add, SIGNAL(clicked()), this, SLOT(slot_pushAddPoint())) ;
@@ -139,9 +141,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	size.setHeight(ui->spinBox_grid_h_map->value()) ;
 	g_Setting->setMapGridSize(size) ;
 
-	g_Setting->setScrollAreaMapGeometry(ui->scrollArea_Map->saveGeometry()) ;
+	g_Setting->setSplitterMapState(m_pSplitterMap->saveState());
+	g_Setting->setSplitterMapGeometry(m_pSplitterMap->saveGeometry()) ;
 
-	g_Setting->setFrameMapGeometry(ui->frame_map->saveGeometry()) ;
+	g_Setting->setFrameMapSize(ui->frame_map->size()) ;
+	g_Setting->setFrameTreeSize(ui->frame_tree->size()) ;
+	g_Setting->setFrameImageSize(ui->frame_image->size()) ;
+
 	g_Setting->setMainWindowGeometry(saveGeometry()) ;
 	g_Setting->setMainWindowState(saveState(kVersion)) ;
 	g_Setting->writeSetting();
@@ -149,7 +155,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::resizeEvent(QResizeEvent *)
 {
-	qDebug() << "resizeEvent" ;
 	slot_splitterMoveMap(0, 0);
 }
 
@@ -235,7 +240,6 @@ void MainWindow::slot_splitterMoveMap(int, int)
 	m_pSplitterMap->resize(size) ;
 
 	size = ui->frame_map->size() - QSize(ui->scrollArea_Map->x(), ui->scrollArea_Map->y()) - m_frameMapSpace ;
-	qDebug() << "frame_map:" << ui->frame_map->size() << " scrollArea:" << ui->scrollArea_Map->pos() << " size:" << size ;
 	ui->scrollArea_Map->resize(size) ;
 	size = ui->frame_tree->size() - QSize(ui->listView_map->x(), ui->listView_map->y()) - m_frameTreeSpace ;
 	ui->listView_map->resize(size) ;
@@ -451,6 +455,7 @@ void MainWindow::slot_clickedListViewPoint(QModelIndex index)
 // タブ変更
 void MainWindow::slot_tabChanged(int index)
 {
+	slot_splitterMoveImage(0, 0) ;
 	g_EditData->setEditMode(index) ;
 	g_EditData->update();
 }
@@ -653,13 +658,17 @@ void MainWindow::restoreSettings()
 	ui->spinBox_grid_w_map->setValue(g_Setting->getMapGridSize().width()) ;
 	ui->spinBox_grid_h_map->setValue(g_Setting->getMapGridSize().height()) ;
 
-	ui->frame_map->restoreGeometry(g_Setting->getFrameMapGeometry()) ;
-
 	restoreState(g_Setting->getMainWindowState()) ;
 	restoreGeometry(g_Setting->getMainWindowGeometry()) ;
 
-//	slot_splitterMoveMap(0, 0) ;
+	m_pSplitterMap->restoreState(g_Setting->getSplitterMapState()) ;
+	m_pSplitterMap->restoreGeometry(g_Setting->getSplitterMapGeometry()) ;
 
+	ui->frame_map->resize(g_Setting->getFrameMapSize().toSize()) ;
+	ui->frame_tree->resize(g_Setting->getFrameTreeSize().toSize()) ;
+	ui->frame_image->resize(g_Setting->getFrameImageSize().toSize()) ;
+
+//	slot_splitterMoveMap(0, 0) ;
 //	g_EditData->setViewMode(g_Setting->getViewMode()) ;
 }
 

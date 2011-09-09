@@ -88,6 +88,7 @@ private:
 
 	QString			m_strSaveFileName ;
 	QSplitter		*m_pSplitterMap ;
+	QTabWidget		*m_pTabWidget ;
 
 	QSize			m_frameImageSpace ;
 	QSize			m_frameMapSpace ;

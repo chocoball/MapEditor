@@ -31,8 +31,9 @@ public:
 	kAccessor(QByteArray, m_SplitterMapState, SplitterMapState)
 	kAccessor(QByteArray, m_LabelImageGeometry, LabelImageGeometry)
 	kAccessor(QByteArray, m_LabelImageState, LabelImageState)
-	kAccessor(QByteArray, m_ScrollAreaMapGeometry, ScrollAreaMapGeometry)
-	kAccessor(QByteArray, m_frameMapGeometry, FrameMapGeometry)
+	kAccessor(QVariant, m_frameMapSize, FrameMapSize)
+	kAccessor(QVariant, m_frameTreeSize, FrameTreeSize)
+	kAccessor(QVariant, m_frameImageSize, FrameImageSize)
 
 	kAccessor(QSize, m_imgGridSize, ImageGridSize)
 	kAccessor(QSize, m_mapGridSize, MapGridSize)
