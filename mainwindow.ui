@@ -495,8 +495,16 @@
      <string>編集</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menu_Disp">
+    <property name="title">
+     <string>表示</string>
+    </property>
+    <addaction name="action_Square"/>
+    <addaction name="action_Quarter"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menu_Edit"/>
+   <addaction name="menu_Disp"/>
   </widget>
   <action name="action_Open">
    <property name="text">
@@ -518,19 +526,25 @@
     <string>終了</string>
    </property>
   </action>
+  <action name="action_Json">
+   <property name="text">
+    <string>JSON</string>
+   </property>
+  </action>
   <action name="action_Square">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>正面</string>
    </property>
   </action>
   <action name="action_Quarter">
-   <property name="text">
-    <string>クォータービュー</string>
+   <property name="checkable">
+    <bool>true</bool>
    </property>
-  </action>
-  <action name="action_Json">
    <property name="text">
-    <string>JSON</string>
+    <string>クォーター</string>
    </property>
   </action>
  </widget>

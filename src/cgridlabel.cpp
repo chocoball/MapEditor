@@ -35,34 +35,35 @@ void CGridLabel::updateGrid()
 			resize(pix.size());
 		}
 		break ;
-#if 0
 	case CEditData::kViewMode_Quarter:
 		{
 			int gridW = m_gridSize.width() ;
 			int gridH = m_gridSize.height() ;
 			if ( gridW < 1 || gridH < 1 ) { return ; }
-			QSize size = QSize(gridW*m_gridNum.x(), gridH*m_gridNum.y()) ;
-			if ( size.width() < 1 || size.height() < 1 ) { return ; }
-			QImage img = QImage(size.width(), size.height(), QImage::Format_ARGB32) ;
+			QSize worldSize = QSize(gridW*m_gridNum.x(), gridH*m_gridNum.y()) * m_mag ;
+			if ( worldSize.width() < 1 || worldSize.height() < 1 ) { return ; }
+			QSize gridSize = m_gridSize * m_mag ;
+			QImage img = QImage(worldSize.width(), worldSize.height(), QImage::Format_ARGB32) ;
 			QPixmap pix = QPixmap::fromImage(img) ;
+
 			QPainter painter(&pix) ;
 			painter.setPen(QColor(0, 0, 0)) ;
-			for ( int i = 0 ; i <= m_gridSize.width() ; i ++ ) {
-				QPoint p0 = g_EditData->gridToQuarter(QPoint(i, 0), m_gridSize, size) ;
-				QPoint p1 = g_EditData->gridToQuarter(QPoint(i, m_gridSize.height()), m_gridSize, size) ;
+			for ( int i = 0 ; i <= m_gridNum.x() ; i ++ ) {
+				QPoint p0 = g_EditData->gridToQuarter(QPoint(i, 0), gridSize, worldSize) ;
+				QPoint p1 = g_EditData->gridToQuarter(QPoint(i, m_gridNum.y()), gridSize, worldSize) ;
 				painter.drawLine(p0, p1) ;
 			}
-			for ( int i = 0 ; i <= m_gridSize.height() ; i ++ ) {
-				QPoint p0 = g_EditData->gridToQuarter(QPoint(0, i), m_gridSize, size) ;
-				QPoint p1 = g_EditData->gridToQuarter(QPoint(m_gridSize.width(), i), m_gridSize, size) ;
+			for ( int i = 0 ; i <= m_gridNum.y() ; i ++ ) {
+				QPoint p0 = g_EditData->gridToQuarter(QPoint(0, i), gridSize, worldSize) ;
+				QPoint p1 = g_EditData->gridToQuarter(QPoint(m_gridNum.x(), i), gridSize, worldSize) ;
 				painter.drawLine(p0, p1) ;
 			}
 			painter.end() ;
+
 			setPixmap(pix) ;
 			resize(img.size()) ;
 		}
 		break ;
-#endif
 	}
 }
 
