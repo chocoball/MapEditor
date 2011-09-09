@@ -136,7 +136,11 @@ public:
 	int addMap(MapData &data, QList<CListModelTreasure::TreasureData> *pTreasureDatas, QList<CListModelPoint::PointData> *pPointDatas, int row) ;
 	bool removeMap(int row) ;
 
-	MapData &getMap(int row) { return m_mapDatas[row] ; }
+	MapData *getMap(int row)
+	{
+		if ( row < 0 || row >= m_mapDatas.size() ) { return NULL ; }
+		return &m_mapDatas[row] ;
+	}
 	QList<MapData> &getList() { return m_mapDatas ; }
 
 

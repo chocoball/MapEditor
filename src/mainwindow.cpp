@@ -41,9 +41,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	m_pTabWidget->insertTab(CEditData::kEditMode_Map, ui->frame_image, trUtf8("マップ")) ;
 	m_pTabWidget->insertTab(CEditData::kEditMode_Data, ui->frame_data, trUtf8("データ")) ;
 
-	qDebug() << "frame_tree:" << ui->frame_tree->size() ;
-	qDebug() << "frame_image:" << ui->frame_image->size() ;
-
 	m_pSplitterMap->addWidget(ui->frame_tree);
 	m_pSplitterMap->addWidget(ui->frame_map);
 	m_pSplitterMap->addWidget(m_pTabWidget) ;
@@ -51,6 +48,13 @@ MainWindow::MainWindow(QWidget *parent) :
 								0,
 								m_pTabWidget->width()+ui->frame_map->width()+ui->frame_tree->width(),
 								ui->frame_map->height());
+
+	QStringList comboTexts ;
+	comboTexts << "0.5" << "1" ;
+	ui->comboBox_dispMag->addItems(comboTexts) ;
+	ui->comboBox_dispMag->setCurrentIndex(1);
+	g_EditData->setDispMagMap(1) ;
+
 	setSpaceSize() ;
 	this->resize(this->minimumSize()) ;
 	restoreSettings() ;
@@ -114,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_pActAddStartPoint, SIGNAL(triggered()), this, SLOT(slot_clickAddStartPoint())) ;
 	connect(m_pActAddEndPoint, SIGNAL(triggered()), this, SLOT(slot_clickAddEndPoint())) ;
 	connect(g_EditData->getUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(slot_changeDataModified(int))) ;
-
+	connect(ui->comboBox_dispMag, SIGNAL(currentIndexChanged(QString)), this, SLOT(slot_changeDispMag(QString))) ;
 }
 
 MainWindow::~MainWindow()
@@ -298,8 +302,6 @@ void MainWindow::slot_changeMapGridH(int val)
 // ユニット配置 チェックボックス変更
 void MainWindow::slot_clickCheckBoxUnit(bool val)
 {
-	qDebug() << "slot_clickCheckBoxUnit" << val ;
-
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 	if ( !p ) { return ; }
 
@@ -416,8 +418,6 @@ void MainWindow::slot_clickPushDel()
 // Map 選択
 void MainWindow::slot_clickedListViewMap(QModelIndex index)
 {
-	qDebug() << "slot_clickedListViewMap" ;
-
 	g_EditData->setSelMapIndex(index) ;
 
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
@@ -502,7 +502,6 @@ void MainWindow::slot_pushDelPoint()
 void MainWindow::slot_clickAddStartPoint()
 {
 	CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
-	qDebug() << "slot_clickAddStartPoint:" << p ;
 	if ( !p ) { return ; }
 
 	g_EditData->cmd_AddPoint(0) ;
@@ -554,6 +553,17 @@ void MainWindow::slot_exportJSON()
 	fileWrite(str) ;
 }
 
+// 表示倍率変更
+void MainWindow::slot_changeDispMag(QString str)
+{
+	bool bOk = false ;
+	float mag = str.toFloat(&bOk) ;
+	qDebug() << "slot_changeDispMag:" << str << "bOk:" << bOk ;
+	if ( !bOk ) { return ; }
+	g_EditData->setDispMagMap(mag) ;
+	g_EditData->updateMap();
+}
+
 // ファイルを開く
 void MainWindow::fileOpen(QString &fileName)
 {
@@ -572,7 +582,6 @@ void MainWindow::fileOpen(QString &fileName)
 			QMessageBox::warning(this, trUtf8("エラー"), trUtf8("読み込みに失敗しました:%1").arg(fileName)) ;
 			return ;
 		}
-		qDebug() << "orig size:" << image.size() ;
 
 		CListModelMap::MapData *p = g_EditData->getSelectMapData() ;
 		if ( !p ) {
@@ -581,22 +590,22 @@ void MainWindow::fileOpen(QString &fileName)
 				QMessageBox::warning(this, trUtf8("エラー"), trUtf8("未知の不具合")) ;
 				return ;
 			}
-			CListModelMap::MapData &data = g_EditData->getModelMap()->getMap(index) ;
-			data.image = image ;
-			data.imageName = fileName ;
-			data.imgGridSize = QSize(ui->spinBox_grid_w_img->value(), ui->spinBox_grid_h_img->value()) ;
-			data.mapGridSize = QSize(ui->spinBox_grid_w_map->value(), ui->spinBox_grid_h_map->value()) ;
+			CListModelMap::MapData *pData = g_EditData->getModelMap()->getMap(index) ;
+			pData->image = image ;
+			pData->imageName = fileName ;
+			pData->imgGridSize = QSize(ui->spinBox_grid_w_img->value(), ui->spinBox_grid_h_img->value()) ;
+			pData->mapGridSize = QSize(ui->spinBox_grid_w_map->value(), ui->spinBox_grid_h_map->value()) ;
 
 			QModelIndex idx = g_EditData->getModelMap()->index(index) ;
 			ui->listView_map->setCurrentIndex(idx);
 		}
 		else {
 			p->image = image ;
+			p->imageName = fileName ;
 			g_EditData->update() ;
 		}
 
 		g_EditData->update() ;
-		m_strSaveFileName = QString() ;
 	}
 	else if ( fileName.toLower().indexOf(kFileExt_JSON) > 0 ) {	// JSONファイル
 		m_strSaveFileName = fileName ;

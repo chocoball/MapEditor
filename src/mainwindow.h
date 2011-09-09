@@ -60,6 +60,7 @@ public slots:
 	void slot_clickViewQuarter() ;
 
 	void slot_exportJSON() ;
+	void slot_changeDispMag(QString str) ;
 
 signals:
 	void sig_keyPress(QKeyEvent *) ;

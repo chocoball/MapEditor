@@ -15,6 +15,7 @@ public:
 	kAccessor(QSize, m_gridSize, GridSize)
 	kAccessor(QPoint, m_gridNum, GridNum)
 	kAccessor(int, m_viewMode, ViewMode)
+	kAccessor(float, m_mag, Mag)
 
 signals:
 	void sig_mousePress(QMouseEvent *) ;

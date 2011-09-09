@@ -51,7 +51,7 @@ public:
 		if ( !isSelectMap() ) { return NULL ; }
 
 		QModelIndex modelIndex = getSelMapIndex() ;
-		return &m_pModelMap->getMap(modelIndex.row()) ;
+		return m_pModelMap->getMap(modelIndex.row()) ;
 	}
 
 	CListModelTreasure::TreasureData *getSelectTreasureData()
@@ -61,7 +61,7 @@ public:
 		CListModelMap::MapData *p = getSelectMapData() ;
 		if ( !p ) { return NULL ; }
 
-		return &p->pModelTreasure->getTreasure(getSelTreasureIndex().row()) ;
+		return p->pModelTreasure->getTreasure(getSelTreasureIndex().row()) ;
 	}
 
 	CListModelPoint::PointData *getSelectPointData()
@@ -71,7 +71,7 @@ public:
 		CListModelMap::MapData *p = getSelectMapData() ;
 		if ( !p ) { return NULL ; }
 
-		return &p->pModelPoint->getPoint(getSelPointIndex().row()) ;
+		return p->pModelPoint->getPoint(getSelPointIndex().row()) ;
 	}
 
 	// マップ追加 コマンド
@@ -136,6 +136,7 @@ public:
 	kAccessor(CListModelMap*, m_pModelMap, ModelMap)
 	kAccessor(QUndoStack*, m_pUndoStack, UndoStack)
 	kAccessor(int, m_viewMode, ViewMode)
+	kAccessor(float, m_dispMagMap, DispMagMap)
 
 private:
 };

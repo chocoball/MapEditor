@@ -4,6 +4,7 @@ CGridLabel::CGridLabel(QWidget *parent) :
     QLabel(parent)
 {
 	m_viewMode = CEditData::kViewMode_Square ;
+	m_mag = 1 ;
 }
 
 void CGridLabel::updateGrid()
@@ -14,26 +15,27 @@ void CGridLabel::updateGrid()
 			int gridW = m_gridSize.width() ;
 			int gridH = m_gridSize.height() ;
 			if ( gridW < 1 || gridH < 1 ) { return ; }
-			int w = gridW*m_gridNum.x() ;
-			int h = gridH*m_gridNum.y() ;
+			int w = gridW*m_gridNum.x() * m_mag ;
+			int h = gridH*m_gridNum.y() * m_mag ;
 			if ( w < 1 || h < 1 ) { return ; }
 			QImage img = QImage(w, h, QImage::Format_ARGB32) ;
 			QColor col(0, 0, 0) ;
-			for ( int y = 0 ; y < img.height() ; y += gridH ) {
+			for ( int y = 0 ; y < img.height() ; y += gridH * m_mag ) {
 				for ( int x = 0 ; x < img.width() ; x ++ ) {
 					img.setPixel(x, y, col.rgba()) ;
 				}
 			}
-			for ( int x = 0 ; x < img.width() ; x += gridW ) {
+			for ( int x = 0 ; x < img.width() ; x += gridW * m_mag ) {
 				for ( int y = 0 ; y < img.height() ; y ++ ) {
 					img.setPixel(x, y, col.rgba()) ;
 				}
 			}
 			QPixmap pix = QPixmap::fromImage(img) ;
 			setPixmap(pix) ;
-			resize(img.size());
+			resize(pix.size());
 		}
 		break ;
+#if 0
 	case CEditData::kViewMode_Quarter:
 		{
 			int gridW = m_gridSize.width() ;
@@ -60,6 +62,7 @@ void CGridLabel::updateGrid()
 			resize(img.size()) ;
 		}
 		break ;
+#endif
 	}
 }
 

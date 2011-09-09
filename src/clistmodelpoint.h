@@ -32,7 +32,11 @@ public:
 	void removePoint(QPoint mapGrid) ;
 	void removePoint(int index) ;
 
-	PointData &getPoint(int index) { return m_datas[index] ; }
+	PointData *getPoint(int index)
+	{
+		if ( index < 0 || index >= m_datas.size() ) { return NULL ; }
+		return &m_datas[index] ;
+	}
 	QList<PointData> &getList() { return m_datas ; }
 
 	int getPointIndex(QPoint mapGrid)

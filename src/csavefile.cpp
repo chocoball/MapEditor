@@ -52,6 +52,7 @@ bool CSaveFileJson::toStringMap(QString &str)
 		str += QString("\t\t\"map_grid_size\": [%1, %2],\n").arg(data.mapGridSize.width()).arg(data.mapGridSize.height()) ;
 		str += QString("\t\t\"img_grid_size\": [%1, %2],\n").arg(data.imgGridSize.width()).arg(data.imgGridSize.height()) ;
 		str += QString("\t\t\"image_name\": \"%1.png\",\n").arg(QFileInfo(data.imageName).baseName()) ;
+		str += QString("\t\t\"image_size\": [%1, %2],\n").arg(data.image.width()).arg(data.image.height()) ;
 #if 1
 		str += "\t\t\"grid\": [\n" ;
 		for ( int y = 0 ; y < gridNum.height() ; y ++ ) {
@@ -77,11 +78,11 @@ bool CSaveFileJson::toStringMap(QString &str)
 					}
 					index = data.pModelPoint->getPointIndex(grid.mapGrid) ;
 					if ( index >= 0 ) {
-						str += QString(", \"kind\": %1").arg(data.pModelPoint->getPoint(index).kind+1) ;
+						str += QString(", \"kind\": %1").arg(data.pModelPoint->getPoint(index)->kind+1) ;
 					}
 					index = data.pModelTreasure->getTreasureIndex(grid.mapGrid) ;
 					if ( index >= 0 ) {
-						str += QString(", \"treasure\": %1").arg(data.pModelTreasure->getTreasure(index).num) ;
+						str += QString(", \"treasure\": %1").arg(data.pModelTreasure->getTreasure(index)->num) ;
 					}
 
 					str += " }" ;
@@ -360,26 +361,26 @@ bool CSaveFileXml::readMap(QDomElement &root, int mapNum)
 		int row = g_EditData->getModelMap()->addMap(nodeMap.namedItem(kAttr_MapName).toAttr().value()) ;
 		if ( row < 0 ) { return false ; }
 
-		CListModelMap::MapData &mapData = g_EditData->getModelMap()->getMap(row) ;
+		CListModelMap::MapData *pMapData = g_EditData->getModelMap()->getMap(row) ;
 
-		mapData.imageName = nodeMap.namedItem(kAttr_ImageName).toAttr().value() ;
-		if ( !mapData.imageName.isEmpty() ) {
-			if ( !mapData.image.load(mapData.imageName) ) { return false ; }
+		pMapData->imageName = nodeMap.namedItem(kAttr_ImageName).toAttr().value() ;
+		if ( !pMapData->imageName.isEmpty() ) {
+			if ( !pMapData->image.load(pMapData->imageName) ) { return false ; }
 		}
 
 		QDomNode node = n.namedItem(kId_MapGridSize) ;
 		if ( node.isNull() ) { return false ; }
-		mapData.mapGridSize.setWidth(node.attributes().namedItem(kAttr_W).toAttr().value().toInt()) ;
-		mapData.mapGridSize.setHeight(node.attributes().namedItem(kAttr_H).toAttr().value().toInt()) ;
+		pMapData->mapGridSize.setWidth(node.attributes().namedItem(kAttr_W).toAttr().value().toInt()) ;
+		pMapData->mapGridSize.setHeight(node.attributes().namedItem(kAttr_H).toAttr().value().toInt()) ;
 		node = n.namedItem(kId_ImageGridSize) ;
 		if ( node.isNull() ) { return false ; }
-		mapData.imgGridSize.setWidth(node.attributes().namedItem(kAttr_W).toAttr().value().toInt()) ;
-		mapData.imgGridSize.setHeight(node.attributes().namedItem(kAttr_H).toAttr().value().toInt()) ;
+		pMapData->imgGridSize.setWidth(node.attributes().namedItem(kAttr_W).toAttr().value().toInt()) ;
+		pMapData->imgGridSize.setHeight(node.attributes().namedItem(kAttr_H).toAttr().value().toInt()) ;
 
-		if ( !readMapData(mapData, n.namedItem(kId_MapData)) ) { return false ; }
-		if ( !readImageData(mapData, n.namedItem(kId_ImageData)) ) { return false ; }
-		if ( !readTreasure(mapData, n.namedItem(kId_Treasure)) ) { return false ; }
-		if ( !readPoint(mapData, n.namedItem(kId_Point)) ) { return false ; }
+		if ( !readMapData(*pMapData, n.namedItem(kId_MapData)) ) { return false ; }
+		if ( !readImageData(*pMapData, n.namedItem(kId_ImageData)) ) { return false ; }
+		if ( !readTreasure(*pMapData, n.namedItem(kId_Treasure)) ) { return false ; }
+		if ( !readPoint(*pMapData, n.namedItem(kId_Point)) ) { return false ; }
 
 		n = n.nextSibling() ;
 	}

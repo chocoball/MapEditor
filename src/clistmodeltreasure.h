@@ -31,7 +31,11 @@ public:
 	int addTreasure(QPoint mapGrid, int num) ;
 	void removeTreasure(int row) ;
 
-	TreasureData &getTreasure(int row) { return m_datas[row] ; }
+	TreasureData *getTreasure(int row)
+	{
+		if ( row < 0 || row >= m_datas.size() ) { return NULL ; }
+		return &m_datas[row] ;
+	}
 	QList<TreasureData> &getList() { return m_datas ; }
 
 	int getTreasureIndex(QPoint mapGrid)
